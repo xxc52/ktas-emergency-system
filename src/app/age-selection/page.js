@@ -18,10 +18,11 @@ export default function AgeSelection() {
 
   useEffect(() => {
     const worker = localStorage.getItem('selectedWorker');
-    if (worker) {
+    const rescuerId = localStorage.getItem('selectedRescuerId');
+    if (worker && rescuerId) {
       const workerData = JSON.parse(worker);
       setSelectedWorker(workerData);
-      loadPresets(workerData.id);
+      loadPresets(parseInt(rescuerId));
     }
   }, []);
 

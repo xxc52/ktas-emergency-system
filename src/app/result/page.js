@@ -63,8 +63,10 @@ export default function Result() {
         evaluationTime: new Date().toISOString()
       };
 
+      const rescuerId = localStorage.getItem('selectedRescuerId');
+      
       const saved = await savePatientAssessment(
-        resultData.worker.id,
+        parseInt(rescuerId) || resultData.worker.id,
         patientType,
         assessmentData,
         resultData.ktasLevel,
@@ -84,6 +86,7 @@ export default function Result() {
   const handleStartOver = () => {
     // Clear all stored data
     localStorage.removeItem('selectedWorker');
+    localStorage.removeItem('selectedRescuerId');
     localStorage.removeItem('selectedAge');
     localStorage.removeItem('ktasResult');
     localStorage.removeItem('recordSaved');

@@ -1,29 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-const emergencyWorkers = [
-  { id: 1, name: "이다정", role: "구급대장", experience: "10년차" },
-  { id: 2, name: "김채운", role: "구급대원", experience: "7년차" },
-  { id: 3, name: "신준용", role: "구급대원", experience: "5년차" },
-  { id: 4, name: "김정현", role: "구급대원", experience: "3년차" },
-  { id: 5, name: "김배호", role: "구급대원", experience: "2년차" },
-  { id: 6, name: "이현석", role: "인턴", experience: "1년차" },
-];
+import { getAllRescuers, createRescuer } from "@/utils/rescuersSupabase";
 
 export default function ProfileSelection() {
   const router = useRouter();
   const [selectedWorker, setSelectedWorker] = useState(null);
+  const [rescuers, setRescuers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newRescuerName, setNewRescuerName] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+
+  // DB에서 구조대원 목록 로드
+  useEffect(() => {
+    loadRescuers();
+  }, []);
+
+  const loadRescuers = async () => {
+    setLoading(true);
+    const data = await getAllRescuers();
+    setRescuers(data);
+    setLoading(false);
+  };
 
   const handleWorkerSelect = (worker) => {
     setSelectedWorker(worker);
     // Store selected worker in localStorage for later use
     localStorage.setItem("selectedWorker", JSON.stringify(worker));
+    localStorage.setItem("selectedRescuerId", worker.id);
     // Navigate to age selection
     setTimeout(() => {
       router.push("/age-selection");
     }, 300);
+  };
+
+  const handleAddRescuer = async (e) => {
+    e.preventDefault();
+    if (!newRescuerName.trim()) return;
+
+    setIsCreating(true);
+    try {
+      await createRescuer(newRescuerName.trim());
+      setNewRescuerName("");
+      setShowAddForm(false);
+      await loadRescuers(); // 목록 새로고침
+    } catch (error) {
+      alert("구조대원 추가 중 오류가 발생했습니다.");
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const handleViewRecords = () => {
@@ -50,8 +77,13 @@ export default function ProfileSelection() {
           </p>
         </div>
 
-        <div className="button-grid profile-grid">
-          {emergencyWorkers.map((worker) => (
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "40px" }}>
+            <p style={{ fontSize: "18px", color: "#666" }}>로딩 중...</p>
+          </div>
+        ) : (
+          <div className="button-grid profile-grid">
+            {rescuers.map((worker) => (
             <button
               key={worker.id}
               className={`category-button ${
@@ -71,25 +103,114 @@ export default function ProfileSelection() {
                 </div>
                 <div
                   style={{
-                    fontSize: "16px",
-                    color: selectedWorker?.id === worker.id ? "#fff" : "#666",
-                    marginBottom: "4px",
-                  }}
-                >
-                  {worker.role}
-                </div>
-                <div
-                  style={{
                     fontSize: "14px",
                     color: selectedWorker?.id === worker.id ? "#fff" : "#999",
                   }}
                 >
-                  {worker.experience}
+                  구조대원 #{worker.id}
                 </div>
               </div>
             </button>
           ))}
-        </div>
+          
+          {/* 새 구조대원 추가 버튼 */}
+          {!showAddForm ? (
+            <button
+              className="category-button add-rescuer-button"
+              onClick={() => setShowAddForm(true)}
+              style={{
+                border: "2px dashed #999",
+                backgroundColor: "transparent",
+              }}
+            >
+              <div style={{ textAlign: "center" }}>
+                <div
+                  style={{
+                    fontSize: "48px",
+                    marginBottom: "8px",
+                    color: "#999",
+                  }}
+                >
+                  +
+                </div>
+                <div style={{ fontSize: "16px", color: "#666" }}>
+                  새 구조대원 추가
+                </div>
+              </div>
+            </button>
+          ) : (
+            <form
+              onSubmit={handleAddRescuer}
+              className="category-button"
+              style={{
+                border: "2px solid #4a90e2",
+                backgroundColor: "#f8f9fa",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                padding: "20px",
+              }}
+            >
+              <input
+                type="text"
+                value={newRescuerName}
+                onChange={(e) => setNewRescuerName(e.target.value)}
+                placeholder="구조대원 이름"
+                disabled={isCreating}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  fontSize: "16px",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                  marginBottom: "12px",
+                  textAlign: "center",
+                }}
+                autoFocus
+              />
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  type="submit"
+                  disabled={isCreating || !newRescuerName.trim()}
+                  style={{
+                    flex: 1,
+                    padding: "8px",
+                    fontSize: "14px",
+                    backgroundColor: "#4a90e2",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: isCreating ? "not-allowed" : "pointer",
+                    opacity: isCreating || !newRescuerName.trim() ? 0.6 : 1,
+                  }}
+                >
+                  {isCreating ? "추가 중..." : "추가"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddForm(false);
+                    setNewRescuerName("");
+                  }}
+                  disabled={isCreating}
+                  style={{
+                    flex: 1,
+                    padding: "8px",
+                    fontSize: "14px",
+                    backgroundColor: "#666",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  취소
+                </button>
+              </div>
+            </form>
+          )}
+          </div>
+        )}
       </div>
     </div>
   );
