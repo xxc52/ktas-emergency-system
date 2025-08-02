@@ -2,18 +2,47 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { 
+  getPresetsByRescuer, 
+  deletePreset, 
+  createSystemPresets, 
+  hasPresets 
+} from '../../utils/presetSupabase';
 
 export default function AgeSelection() {
   const router = useRouter();
   const [selectedWorker, setSelectedWorker] = useState(null);
   const [selectedAge, setSelectedAge] = useState(null);
+  const [presets, setPresets] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const worker = localStorage.getItem('selectedWorker');
     if (worker) {
-      setSelectedWorker(JSON.parse(worker));
+      const workerData = JSON.parse(worker);
+      setSelectedWorker(workerData);
+      loadPresets(workerData.id);
     }
   }, []);
+
+  const loadPresets = async (rescuerId) => {
+    try {
+      setLoading(true);
+      const hasExistingPresets = await hasPresets(rescuerId);
+      
+      if (!hasExistingPresets) {
+        // 초기 시스템 프리셋 생성
+        await createSystemPresets(rescuerId);
+      }
+      
+      const presetData = await getPresetsByRescuer(rescuerId);
+      setPresets(presetData);
+    } catch (error) {
+      console.error('프리셋 로드 오류:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAgeSelect = (ageType) => {
     setSelectedAge(ageType);
@@ -26,6 +55,23 @@ export default function AgeSelection() {
         router.push('/pediatric-input');
       }
     }, 300);
+  };
+
+  const handlePresetSelect = (preset) => {
+    localStorage.setItem('selectedAge', 'adult');
+    localStorage.setItem('selectedPreset', JSON.stringify(preset.preset_data));
+    router.push('/adult-input');
+  };
+
+  const handleDeletePreset = async (presetId, e) => {
+    e.stopPropagation(); // 버튼 클릭이 부모로 전파되지 않도록
+    
+    if (confirm('이 프리셋을 삭제하시겠습니까?')) {
+      const success = await deletePreset(presetId);
+      if (success) {
+        setPresets(presets.filter(p => p.id !== presetId));
+      }
+    }
   };
 
   const handleBack = () => {
@@ -91,6 +137,44 @@ export default function AgeSelection() {
             </div>
           </button>
         </div>
+
+        {/* 프리셋 섹션 */}
+        {!loading && presets.length > 0 && (
+          <div style={{ marginTop: '50px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+              <h3 style={{ fontSize: '24px', color: '#333', marginBottom: '10px' }}>
+                빠른 선택 (성인용)
+              </h3>
+              <p style={{ fontSize: '16px', color: '#666' }}>
+                자주 사용하는 상황을 바로 선택할 수 있습니다
+              </p>
+            </div>
+
+            <div className="preset-grid">
+              {presets.map((preset) => (
+                <div
+                  key={preset.id}
+                  className="preset-button"
+                  onClick={() => handlePresetSelect(preset)}
+                >
+                  <div className="preset-content">
+                    <div className="preset-name">{preset.preset_name}</div>
+                    <div className="preset-details">
+                      {preset.preset_data.category} → {preset.preset_data.disease}
+                    </div>
+                  </div>
+                  <button
+                    className="preset-delete-btn"
+                    onClick={(e) => handleDeletePreset(preset.id, e)}
+                    title="삭제"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

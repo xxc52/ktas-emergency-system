@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { savePatientAssessment } from '../../utils/patientRecordsSupabase';
 
 const ktasColors = {
   1: '#FF0000', // Red - 즉시
@@ -22,19 +23,70 @@ const ktasLabels = {
 export default function Result() {
   const router = useRouter();
   const [result, setResult] = useState(null);
+  const [recordSaved, setRecordSaved] = useState(false);
 
   useEffect(() => {
     const savedResult = localStorage.getItem('ktasResult');
     if (savedResult) {
-      setResult(JSON.parse(savedResult));
+      const resultData = JSON.parse(savedResult);
+      setResult(resultData);
+      
+      // 자동으로 환자 기록 저장
+      saveRecord(resultData);
     }
   }, []);
+
+  const saveRecord = async (resultData) => {
+    try {
+      if (!resultData.worker || !resultData.ktasLevel) {
+        console.warn('기록 저장에 필요한 데이터가 부족합니다.');
+        return;
+      }
+
+      // 이미 저장되었는지 확인 (중복 저장 방지)
+      const alreadySaved = localStorage.getItem('recordSaved');
+      if (alreadySaved) {
+        console.log('이미 저장된 기록입니다.');
+        setRecordSaved(true);
+        return;
+      }
+
+      const patientType = localStorage.getItem('selectedAge') || 'adult';
+      
+      // assessment_data 구조화
+      const assessmentData = {
+        category: resultData.category,
+        primaryDisease: resultData.primaryDisease || resultData.disease,
+        diseases: resultData.diseases || [],
+        firstConsiderations: resultData.firstConsiderations || [],
+        secondConsiderations: resultData.secondConsiderations || [],
+        evaluationTime: new Date().toISOString()
+      };
+
+      const saved = await savePatientAssessment(
+        resultData.worker.id,
+        patientType,
+        assessmentData,
+        resultData.ktasLevel,
+        null // hospital - 나중에 추가 가능
+      );
+
+      if (saved) {
+        console.log('✅ 환자 기록이 저장되었습니다.');
+        localStorage.setItem('recordSaved', 'true');
+        setRecordSaved(true);
+      }
+    } catch (error) {
+      console.error('기록 저장 중 오류:', error);
+    }
+  };
 
   const handleStartOver = () => {
     // Clear all stored data
     localStorage.removeItem('selectedWorker');
     localStorage.removeItem('selectedAge');
     localStorage.removeItem('ktasResult');
+    localStorage.removeItem('recordSaved');
     router.push('/profile');
   };
 

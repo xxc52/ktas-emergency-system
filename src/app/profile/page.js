@@ -26,12 +26,18 @@ export default function ProfileSelection() {
     }, 300);
   };
 
+  const handleViewRecords = () => {
+    router.push("/records");
+  };
+
   return (
     <div className="container">
       <div className="header">
         <div></div>
         <h1 className="title">KTAS 응급구조시스템</h1>
-        <div></div>
+        <button className="next-button" onClick={handleViewRecords}>
+          📊 기록 보기
+        </button>
       </div>
 
       <div className="content">
