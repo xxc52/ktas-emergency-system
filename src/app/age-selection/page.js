@@ -96,57 +96,145 @@ export default function AgeSelection() {
           </div>
         )}
 
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '28px', color: '#333', marginBottom: '15px' }}>
-            환자 연령대를 선택해주세요
+        <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-2xl)' }}>
+          <h2 style={{ 
+            fontSize: '32px', 
+            fontWeight: '700', 
+            color: 'var(--gray-900)', 
+            marginBottom: 'var(--spacing-md)',
+            letterSpacing: '-0.02em'
+          }}>
+            👩‍⚕️ 환자 연령대를 선택해주세요
           </h2>
-          <p style={{ fontSize: '18px', color: '#666' }}>
+          <p style={{ 
+            fontSize: '18px', 
+            color: 'var(--gray-600)',
+            lineHeight: '1.6'
+          }}>
             환자의 연령대에 따라 평가 기준이 달라집니다
           </p>
         </div>
 
-        <div className="button-grid age-selection-grid">
+        <div className="button-grid age-selection-grid" style={{ gap: 'var(--spacing-xl)' }}>
           <button
             className={`category-button ${selectedAge === 'adult' ? 'selected' : ''}`}
             onClick={() => handleAgeSelect('adult')}
-            style={{ padding: '60px 40px' }}
+            style={{ 
+              padding: 'var(--spacing-2xl)',
+              background: selectedAge === 'adult' ? 'var(--primary)' : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+              color: 'var(--white)',
+              border: selectedAge === 'adult' ? '3px solid var(--primary)' : '3px solid transparent',
+              minHeight: '200px',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
           >
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '36px', marginBottom: '15px' }}>👨‍⚕️</div>
-              <div style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '10px' }}>
+            <div style={{ textAlign: 'center', position: 'relative', zIndex: 2 }}>
+              <div style={{ 
+                fontSize: '64px', 
+                marginBottom: 'var(--spacing-lg)',
+                filter: selectedAge === 'adult' ? 'brightness(1.2)' : 'none'
+              }}>
+                {selectedAge === 'adult' ? '✅' : '👨‍⚕️'}
+              </div>
+              <div style={{ 
+                fontSize: '32px', 
+                fontWeight: '700', 
+                marginBottom: 'var(--spacing-md)',
+                textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}>
                 성인
               </div>
-              <div style={{ fontSize: '16px', color: selectedAge === 'adult' ? '#fff' : '#666' }}>
+              <div style={{ 
+                fontSize: '18px', 
+                opacity: 0.95,
+                fontWeight: '500'
+              }}>
                 만 15세 이상
               </div>
             </div>
+            {!selectedAge && (
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)',
+                pointerEvents: 'none'
+              }}></div>
+            )}
           </button>
 
           <button
             className={`category-button ${selectedAge === 'pediatric' ? 'selected' : ''}`}
             onClick={() => handleAgeSelect('pediatric')}
-            style={{ padding: '60px 40px' }}
+            style={{ 
+              padding: 'var(--spacing-2xl)',
+              background: selectedAge === 'pediatric' ? 'var(--primary)' : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+              color: 'var(--white)',
+              border: selectedAge === 'pediatric' ? '3px solid var(--primary)' : '3px solid transparent',
+              minHeight: '200px',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
           >
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '36px', marginBottom: '15px' }}>👶</div>
-              <div style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '10px' }}>
+            <div style={{ textAlign: 'center', position: 'relative', zIndex: 2 }}>
+              <div style={{ 
+                fontSize: '64px', 
+                marginBottom: 'var(--spacing-lg)',
+                filter: selectedAge === 'pediatric' ? 'brightness(1.2)' : 'none'
+              }}>
+                {selectedAge === 'pediatric' ? '✅' : '👶'}
+              </div>
+              <div style={{ 
+                fontSize: '32px', 
+                fontWeight: '700', 
+                marginBottom: 'var(--spacing-md)',
+                textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}>
                 소아
               </div>
-              <div style={{ fontSize: '16px', color: selectedAge === 'pediatric' ? '#fff' : '#666' }}>
+              <div style={{ 
+                fontSize: '18px', 
+                opacity: 0.95,
+                fontWeight: '500'
+              }}>
                 만 15세 미만
               </div>
             </div>
+            {!selectedAge && (
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)',
+                pointerEvents: 'none'
+              }}></div>
+            )}
           </button>
         </div>
 
         {/* 프리셋 섹션 */}
         {!loading && presets.length > 0 && (
-          <div style={{ marginTop: '50px' }}>
-            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-              <h3 style={{ fontSize: '24px', color: '#333', marginBottom: '10px' }}>
-                빠른 선택 (성인용)
+          <div style={{ marginTop: 'var(--spacing-2xl)' }}>
+            <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-xl)' }}>
+              <h3 style={{ 
+                fontSize: '24px', 
+                fontWeight: '700',
+                color: 'var(--gray-900)', 
+                marginBottom: 'var(--spacing-md)',
+                letterSpacing: '-0.01em'
+              }}>
+                ⚡ 빠른 선택 (성인용)
               </h3>
-              <p style={{ fontSize: '16px', color: '#666' }}>
+              <p style={{ 
+                fontSize: '16px', 
+                color: 'var(--gray-600)',
+                lineHeight: '1.5'
+              }}>
                 자주 사용하는 상황을 바로 선택할 수 있습니다
               </p>
             </div>
@@ -176,6 +264,12 @@ export default function AgeSelection() {
             </div>
           </div>
         )}
+
+        {/* 안내 메시지 */}
+        <div className="info-notice">
+          <h4>⚠️ 중요 안내</h4>
+          <p>정확한 연령대 선택은 적절한 응급 처치를 위해 중요합니다</p>
+        </div>
       </div>
     </div>
   );

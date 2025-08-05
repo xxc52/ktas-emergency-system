@@ -338,85 +338,70 @@ export default function AdultInput() {
   }
 
   return (
-    <div className="container">
+    <div className="container adult-input-container">
       <div className="header">
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <button className="back-button" onClick={handleBack}>
-            ← 이전
-          </button>
-          {selectedWorker && (
-            <div className="current-user">
-              평가자: {selectedWorker.name} ({selectedWorker.role})
-            </div>
-          )}
-        </div>
+        <div></div>
         <h1 className="title">KTAS 응급구조시스템 - 성인</h1>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          {selectedCategory && selectedDiseases.length > 0 && (
-            <button className="save-preset-btn" onClick={handleSavePreset}>
-              프리셋으로 저장
-            </button>
-          )}
-          {(selectedDiseases.length > 0 ||
-            selectedFirstConsiderations.length > 0 ||
-            selectedSecondConsiderations.length > 0) && (
-            <button className="clear-button" onClick={handleClearAll}>
-              초기화
-            </button>
-          )}
-          <button
-            className="next-button"
-            onClick={handleNext}
-            disabled={!isNextEnabled}
-          >
-            다음 →
-          </button>
+        <div style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: "var(--spacing-md)",
+          fontSize: "16px",
+          color: "var(--gray-700)"
+        }}>
+          평가자: {selectedWorker?.name || "미선택"}
         </div>
       </div>
 
-      <div className="content">
-        {/* 구분 Navigation */}
-        <div className="category-nav">
-          {categories.map((category) => (
-            <button
-              key={category}
-              className={`category-nav-button ${
-                selectedCategory === category ? "selected" : ""
-              }`}
-              onClick={() => handleCategorySelect(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        {/* Main Content - Show only when category is selected */}
-        {selectedCategory && (
-          <div className="ktas-container">
-            {/* 병명 Section */}
-            <div className="ktas-section">
-              <h3>병명</h3>
-              {sortedDiseases.map((disease) => {
-                const isSelected = selectedDiseases.includes(disease);
-                const isCompatible = diseaseCompatibility[disease];
-
-                return (
-                  <button
-                    key={disease}
-                    className={`option-button ${
-                      isSelected ? "selected" : isCompatible ? "" : "disabled"
-                    }`}
-                    onClick={() => handleDiseaseSelect(disease)}
-                  >
-                    {disease}
-                  </button>
-                );
-              })}
+      <div className="content adult-content">
+        <div className="adult-main-layout">
+          {/* Left Panel - 구분 (Categories) */}
+          <div className="category-vertical-panel">
+            <h3 className="panel-title">구분</h3>
+            <div className="category-vertical-list">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  className={`category-vertical-button ${
+                    selectedCategory === category ? "selected" : ""
+                  }`}
+                  onClick={() => handleCategorySelect(category)}
+                >
+                  {category}
+                </button>
+              ))}
             </div>
+          </div>
+
+          {/* Main Content - Show only when category is selected */}
+          {selectedCategory && (
+            <div className="ktas-horizontal-container">
+              {/* 병명 Section */}
+              <div className="ktas-section">
+                <h3 className="section-title">병명</h3>
+                <div className="option-list">
+                  {sortedDiseases.map((disease) => {
+                    const isSelected = selectedDiseases.includes(disease);
+                    const isCompatible = diseaseCompatibility[disease];
+
+                    return (
+                      <button
+                        key={disease}
+                        className={`option-button ${
+                          isSelected ? "selected" : isCompatible ? "" : "disabled"
+                        }`}
+                        onClick={() => handleDiseaseSelect(disease)}
+                      >
+                        {disease}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
             {/* 1차 고려사항 Section */}
             <div className="ktas-section">
-              <h3>1차 고려사항</h3>
+              <h3 className="section-title">1차 고려사항</h3>
               {selectedFirstConsiderations.length > 0 && (
                 <div className="selected-items">
                   {selectedFirstConsiderations.map((consideration) => (
@@ -432,33 +417,35 @@ export default function AdultInput() {
                   ))}
                 </div>
               )}
-              {sortedFirstConsiderations.map((consideration) => {
-                const isSelected =
-                  selectedFirstConsiderations.includes(consideration);
-                const isCompatible =
-                  firstConsiderationCompatibility[consideration];
+              <div className="option-list">
+                {sortedFirstConsiderations.map((consideration) => {
+                  const isSelected =
+                    selectedFirstConsiderations.includes(consideration);
+                  const isCompatible =
+                    firstConsiderationCompatibility[consideration];
 
-                if (isSelected) return null;
+                  if (isSelected) return null;
 
-                return (
-                  <button
-                    key={consideration}
-                    className={`option-button ${
-                      isCompatible ? "" : "disabled"
-                    }`}
-                    onClick={() =>
-                      handleFirstConsiderationSelect(consideration)
-                    }
-                  >
-                    {consideration}
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={consideration}
+                      className={`option-button ${
+                        isCompatible ? "" : "disabled"
+                      }`}
+                      onClick={() =>
+                        handleFirstConsiderationSelect(consideration)
+                      }
+                    >
+                      {consideration}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* 2차 고려사항 Section */}
             <div className="ktas-section">
-              <h3>2차 고려사항</h3>
+              <h3 className="section-title">2차 고려사항</h3>
               {selectedSecondConsiderations.length > 0 && (
                 <div className="selected-items">
                   {selectedSecondConsiderations.map((consideration) => (
@@ -474,48 +461,73 @@ export default function AdultInput() {
                   ))}
                 </div>
               )}
-              {sortedSecondConsiderations.map((consideration) => {
-                const isSelected =
-                  selectedSecondConsiderations.includes(consideration);
-                const isCompatible =
-                  secondConsiderationCompatibility[consideration];
+              <div className="option-list">
+                {sortedSecondConsiderations.map((consideration) => {
+                  const isSelected =
+                    selectedSecondConsiderations.includes(consideration);
+                  const isCompatible =
+                    secondConsiderationCompatibility[consideration];
 
-                if (isSelected) return null;
+                  if (isSelected) return null;
 
-                return (
-                  <button
-                    key={consideration}
-                    className={`option-button ${
-                      isCompatible ? "" : "disabled"
-                    }`}
-                    onClick={() =>
-                      handleSecondConsiderationSelect(consideration)
-                    }
-                  >
-                    {consideration}
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={consideration}
+                      className={`option-button ${
+                        isCompatible ? "" : "disabled"
+                      }`}
+                      onClick={() =>
+                        handleSecondConsiderationSelect(consideration)
+                      }
+                    >
+                      {consideration}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        )}
+          )}
 
-        {/* Instructions when no category selected */}
-        {!selectedCategory && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "60%",
-              fontSize: "20px",
-              color: "#666",
-              textAlign: "center",
-            }}
-          >
-            위에서 구분을 선택해주세요
+          {/* Instructions when no category selected */}
+          {!selectedCategory && (
+            <div className="empty-state">
+              <div className="empty-state-icon">📋</div>
+              <h3>카테고리를 선택해주세요</h3>
+              <p>좌측에서 환자의 증상에 해당하는 구분을 선택하세요</p>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Navigation */}
+        <div className="bottom-navigation">
+          <button className="nav-button back" onClick={handleBack}>
+            ← 이전
+          </button>
+          
+          <div className="nav-center">
+            {selectedCategory && selectedDiseases.length > 0 && (
+              <button className="save-preset-btn" onClick={handleSavePreset}>
+                💾 프리셋 저장
+              </button>
+            )}
+            {(selectedDiseases.length > 0 ||
+              selectedFirstConsiderations.length > 0 ||
+              selectedSecondConsiderations.length > 0) && (
+              <button className="clear-button" onClick={handleClearAll}>
+                🔄 초기화
+              </button>
+            )}
           </div>
-        )}
+
+          <button
+            className={`nav-button next ${!isNextEnabled ? 'disabled' : ''}`}
+            onClick={handleNext}
+            disabled={!isNextEnabled}
+          >
+            평가 완료
+          </button>
+        </div>
       </div>
     </div>
   );

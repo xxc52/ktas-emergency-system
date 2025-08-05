@@ -68,50 +68,100 @@ export default function ProfileSelection() {
       </div>
 
       <div className="content">
-        <div style={{ textAlign: "center", marginBottom: "30px" }}>
-          <h2 style={{ fontSize: "24px", color: "#333", marginBottom: "10px" }}>
-            응급구조원을 선택해주세요
+        <div style={{ textAlign: "center", marginBottom: "var(--spacing-2xl)" }}>
+          <h2 style={{ 
+            fontSize: "28px", 
+            fontWeight: "700", 
+            color: "var(--gray-900)", 
+            marginBottom: "var(--spacing-md)",
+            letterSpacing: "-0.02em"
+          }}>
+            🚑 구조대원을 선택해주세요
           </h2>
-          <p style={{ fontSize: "18px", color: "#666" }}>
-            환자 평가를 진행할 구조원을 선택하세요
+          <p style={{ 
+            fontSize: "18px", 
+            color: "var(--gray-600)",
+            lineHeight: "1.5"
+          }}>
+            현재 근무 중인 대원을 확인하고 시스템에 로그인하세요
           </p>
         </div>
 
         {loading ? (
-          <div style={{ textAlign: "center", padding: "40px" }}>
-            <p style={{ fontSize: "18px", color: "#666" }}>로딩 중...</p>
+          <div style={{ 
+            textAlign: "center", 
+            padding: "var(--spacing-2xl)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "var(--spacing-md)"
+          }}>
+            <div style={{
+              width: "48px",
+              height: "48px",
+              border: "4px solid var(--gray-200)",
+              borderTop: "4px solid var(--primary)",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite"
+            }}></div>
+            <p style={{ fontSize: "18px", color: "var(--gray-600)" }}>구조대원 목록을 불러오는 중...</p>
           </div>
         ) : (
           <div className="button-grid profile-grid">
-            {rescuers.map((worker) => (
-            <button
-              key={worker.id}
-              className={`category-button ${
-                selectedWorker?.id === worker.id ? "selected" : ""
-              }`}
-              onClick={() => handleWorkerSelect(worker)}
-            >
-              <div style={{ textAlign: "center" }}>
-                <div
+            {rescuers.map((worker, index) => {
+              const colors = [
+                { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', icon: '👨‍⚕️' },
+                { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', icon: '👩‍⚕️' },
+                { bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', icon: '🚑' },
+                { bg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', icon: '⚕️' },
+                { bg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', icon: '🏥' },
+                { bg: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', icon: '🩺' }
+              ];
+              const colorScheme = colors[index % colors.length];
+              const isSelected = selectedWorker?.id === worker.id;
+              
+              return (
+                <button
+                  key={worker.id}
+                  className={`category-button ${isSelected ? "selected" : ""}`}
+                  onClick={() => handleWorkerSelect(worker)}
                   style={{
-                    fontSize: "20px",
-                    fontWeight: "bold",
-                    marginBottom: "8px",
+                    background: isSelected ? 'var(--primary)' : colorScheme.bg,
+                    color: 'var(--white)',
+                    border: isSelected ? '2px solid var(--primary)' : '2px solid transparent',
+                    minHeight: '140px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
                   }}
                 >
-                  {worker.name}
-                </div>
-                <div
-                  style={{
-                    fontSize: "14px",
-                    color: selectedWorker?.id === worker.id ? "#fff" : "#999",
-                  }}
-                >
-                  구조대원 #{worker.id}
-                </div>
-              </div>
-            </button>
-          ))}
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{
+                      fontSize: "48px",
+                      marginBottom: "var(--spacing-md)",
+                      filter: isSelected ? 'brightness(1.2)' : 'none'
+                    }}>
+                      {isSelected ? '✅' : colorScheme.icon}
+                    </div>
+                    <div style={{
+                      fontSize: "20px",
+                      fontWeight: "700",
+                      marginBottom: "var(--spacing-sm)",
+                      textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                    }}>
+                      {worker.name}
+                    </div>
+                    <div style={{
+                      fontSize: "14px",
+                      opacity: 0.9,
+                      fontWeight: "500"
+                    }}>
+                      구조대원 #{worker.id}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           
           {/* 새 구조대원 추가 버튼 */}
           {!showAddForm ? (
@@ -119,21 +169,27 @@ export default function ProfileSelection() {
               className="category-button add-rescuer-button"
               onClick={() => setShowAddForm(true)}
               style={{
-                border: "2px dashed #999",
-                backgroundColor: "transparent",
+                border: "2px dashed var(--gray-300)",
+                background: "var(--gray-50)",
+                minHeight: '140px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
               }}
             >
               <div style={{ textAlign: "center" }}>
-                <div
-                  style={{
-                    fontSize: "48px",
-                    marginBottom: "8px",
-                    color: "#999",
-                  }}
-                >
-                  +
+                <div style={{
+                  fontSize: "48px",
+                  marginBottom: "var(--spacing-md)",
+                  color: "var(--gray-400)",
+                }}>
+                  ➕
                 </div>
-                <div style={{ fontSize: "16px", color: "#666" }}>
+                <div style={{ 
+                  fontSize: "16px", 
+                  color: "var(--gray-600)",
+                  fontWeight: "600"
+                }}>
                   새 구조대원 추가
                 </div>
               </div>
@@ -143,48 +199,58 @@ export default function ProfileSelection() {
               onSubmit={handleAddRescuer}
               className="category-button"
               style={{
-                border: "2px solid #4a90e2",
-                backgroundColor: "#f8f9fa",
+                border: "2px solid var(--primary)",
+                background: "var(--primary-light)",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
-                padding: "20px",
+                padding: "var(--spacing-xl)",
+                minHeight: '140px'
               }}
             >
               <input
                 type="text"
                 value={newRescuerName}
                 onChange={(e) => setNewRescuerName(e.target.value)}
-                placeholder="구조대원 이름"
+                placeholder="구조대원 이름을 입력하세요"
                 disabled={isCreating}
                 style={{
                   width: "100%",
-                  padding: "12px",
+                  padding: "var(--spacing-md)",
                   fontSize: "16px",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                  marginBottom: "12px",
+                  fontWeight: "500",
+                  border: "2px solid var(--gray-200)",
+                  borderRadius: "var(--radius-md)",
+                  marginBottom: "var(--spacing-md)",
                   textAlign: "center",
+                  fontFamily: "inherit",
+                  transition: "all 0.2s ease",
+                  outline: "none"
                 }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--gray-200)'}
                 autoFocus
               />
-              <div style={{ display: "flex", gap: "8px" }}>
+              <div style={{ display: "flex", gap: "var(--spacing-sm)" }}>
                 <button
                   type="submit"
                   disabled={isCreating || !newRescuerName.trim()}
                   style={{
                     flex: 1,
-                    padding: "8px",
+                    padding: "var(--spacing-sm)",
                     fontSize: "14px",
-                    backgroundColor: "#4a90e2",
-                    color: "white",
+                    fontWeight: "600",
+                    background: "var(--primary)",
+                    color: "var(--white)",
                     border: "none",
-                    borderRadius: "4px",
+                    borderRadius: "var(--radius-sm)",
                     cursor: isCreating ? "not-allowed" : "pointer",
                     opacity: isCreating || !newRescuerName.trim() ? 0.6 : 1,
+                    fontFamily: "inherit",
+                    transition: "all 0.2s ease"
                   }}
                 >
-                  {isCreating ? "추가 중..." : "추가"}
+                  {isCreating ? "추가 중..." : "✅ 추가"}
                 </button>
                 <button
                   type="button"
@@ -195,16 +261,19 @@ export default function ProfileSelection() {
                   disabled={isCreating}
                   style={{
                     flex: 1,
-                    padding: "8px",
+                    padding: "var(--spacing-sm)",
                     fontSize: "14px",
-                    backgroundColor: "#666",
-                    color: "white",
+                    fontWeight: "600",
+                    background: "var(--gray-500)",
+                    color: "var(--white)",
                     border: "none",
-                    borderRadius: "4px",
+                    borderRadius: "var(--radius-sm)",
                     cursor: "pointer",
+                    fontFamily: "inherit",
+                    transition: "all 0.2s ease"
                   }}
                 >
-                  취소
+                  ❌ 취소
                 </button>
               </div>
             </form>
