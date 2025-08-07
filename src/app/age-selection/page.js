@@ -82,9 +82,7 @@ export default function AgeSelection() {
   return (
     <div className="container">
       <div className="header">
-        <button className="back-button" onClick={handleBack}>
-          ← 이전
-        </button>
+        <div></div>
         <h1 className="title">KTAS 응급구조시스템</h1>
         <div></div>
       </div>
@@ -96,57 +94,71 @@ export default function AgeSelection() {
           </div>
         )}
 
-        <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-2xl)' }}>
+        <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-md)' }}>
           <h2 style={{ 
-            fontSize: '32px', 
+            fontSize: '26px', 
             fontWeight: '700', 
             color: 'var(--gray-900)', 
-            marginBottom: 'var(--spacing-md)',
+            marginBottom: 'var(--spacing-xs)',
             letterSpacing: '-0.02em'
           }}>
             👩‍⚕️ 환자 연령대를 선택해주세요
           </h2>
           <p style={{ 
-            fontSize: '18px', 
+            fontSize: '15px', 
             color: 'var(--gray-600)',
-            lineHeight: '1.6'
+            lineHeight: '1.4'
           }}>
             환자의 연령대에 따라 평가 기준이 달라집니다
           </p>
         </div>
 
-        <div className="button-grid age-selection-grid" style={{ gap: 'var(--spacing-xl)' }}>
+        <div className="button-grid age-selection-grid" style={{ 
+          gap: 'var(--spacing-md)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          maxWidth: '700px',
+          margin: '0 auto var(--spacing-md) auto'
+        }}>
           <button
             className={`category-button ${selectedAge === 'adult' ? 'selected' : ''}`}
             onClick={() => handleAgeSelect('adult')}
             style={{ 
-              padding: 'var(--spacing-2xl)',
+              padding: 'var(--spacing-lg)',
               background: selectedAge === 'adult' ? 'var(--primary)' : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
               color: 'var(--white)',
               border: selectedAge === 'adult' ? '3px solid var(--primary)' : '3px solid transparent',
-              minHeight: '200px',
+              minHeight: '130px',
+              aspectRatio: '2/1',
               position: 'relative',
               overflow: 'hidden'
             }}
           >
-            <div style={{ textAlign: 'center', position: 'relative', zIndex: 2 }}>
+            <div style={{ 
+              textAlign: 'center', 
+              position: 'relative', 
+              zIndex: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              height: '100%',
+              gap: 'var(--spacing-xs)'
+            }}>
               <div style={{ 
-                fontSize: '64px', 
-                marginBottom: 'var(--spacing-lg)',
+                fontSize: '42px', 
                 filter: selectedAge === 'adult' ? 'brightness(1.2)' : 'none'
               }}>
                 {selectedAge === 'adult' ? '✅' : '👨‍⚕️'}
               </div>
               <div style={{ 
-                fontSize: '32px', 
-                fontWeight: '700', 
-                marginBottom: 'var(--spacing-md)',
+                fontSize: '24px', 
+                fontWeight: '700',
                 textShadow: '0 2px 4px rgba(0,0,0,0.1)'
               }}>
                 성인
               </div>
               <div style={{ 
-                fontSize: '18px', 
+                fontSize: '15px', 
                 opacity: 0.95,
                 fontWeight: '500'
               }}>
@@ -170,33 +182,41 @@ export default function AgeSelection() {
             className={`category-button ${selectedAge === 'pediatric' ? 'selected' : ''}`}
             onClick={() => handleAgeSelect('pediatric')}
             style={{ 
-              padding: 'var(--spacing-2xl)',
+              padding: 'var(--spacing-lg)',
               background: selectedAge === 'pediatric' ? 'var(--primary)' : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
               color: 'var(--white)',
               border: selectedAge === 'pediatric' ? '3px solid var(--primary)' : '3px solid transparent',
-              minHeight: '200px',
+              minHeight: '130px',
+              aspectRatio: '2/1',
               position: 'relative',
               overflow: 'hidden'
             }}
           >
-            <div style={{ textAlign: 'center', position: 'relative', zIndex: 2 }}>
+            <div style={{ 
+              textAlign: 'center', 
+              position: 'relative', 
+              zIndex: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              height: '100%',
+              gap: 'var(--spacing-xs)'
+            }}>
               <div style={{ 
-                fontSize: '64px', 
-                marginBottom: 'var(--spacing-lg)',
+                fontSize: '42px', 
                 filter: selectedAge === 'pediatric' ? 'brightness(1.2)' : 'none'
               }}>
                 {selectedAge === 'pediatric' ? '✅' : '👶'}
               </div>
               <div style={{ 
-                fontSize: '32px', 
+                fontSize: '24px', 
                 fontWeight: '700', 
-                marginBottom: 'var(--spacing-md)',
                 textShadow: '0 2px 4px rgba(0,0,0,0.1)'
               }}>
                 소아
               </div>
               <div style={{ 
-                fontSize: '18px', 
+                fontSize: '15px', 
                 opacity: 0.95,
                 fontWeight: '500'
               }}>
@@ -219,57 +239,87 @@ export default function AgeSelection() {
 
         {/* 프리셋 섹션 */}
         {!loading && presets.length > 0 && (
-          <div style={{ marginTop: 'var(--spacing-2xl)' }}>
-            <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-xl)' }}>
+          <div style={{ 
+            flex: '1',
+            minHeight: '0',
+            padding: 'var(--spacing-md)',
+            background: 'linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%)',
+            borderRadius: 'var(--radius-lg)',
+            border: '2px solid var(--gray-200)',
+            boxShadow: '0 2px 15px rgba(0, 0, 0, 0.06)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-sm)', flexShrink: 0 }}>
               <h3 style={{ 
-                fontSize: '24px', 
+                fontSize: '18px', 
                 fontWeight: '700',
-                color: 'var(--gray-900)', 
-                marginBottom: 'var(--spacing-md)',
+                color: 'var(--primary)', 
+                marginBottom: 'var(--spacing-xs)',
                 letterSpacing: '-0.01em'
               }}>
                 ⚡ 빠른 선택 (성인용)
               </h3>
               <p style={{ 
-                fontSize: '16px', 
+                fontSize: '13px', 
                 color: 'var(--gray-600)',
-                lineHeight: '1.5'
+                lineHeight: '1.3'
               }}>
-                자주 사용하는 상황을 바로 선택할 수 있습니다
+                자주 사용하는 상황을 바로 선택
               </p>
             </div>
 
-            <div className="preset-grid">
-              {presets.map((preset) => (
-                <div
-                  key={preset.id}
-                  className="preset-button"
-                  onClick={() => handlePresetSelect(preset)}
-                >
-                  <div className="preset-content">
-                    <div className="preset-name">{preset.preset_name}</div>
-                    <div className="preset-details">
-                      {preset.preset_data.category} → {preset.preset_data.disease}
-                    </div>
-                  </div>
-                  <button
-                    className="preset-delete-btn"
-                    onClick={(e) => handleDeletePreset(preset.id, e)}
-                    title="삭제"
+            <div style={{
+              flex: '1',
+              minHeight: '0',
+              overflowY: 'auto',
+              padding: 'var(--spacing-xs) var(--spacing-xs) var(--spacing-sm) 0'
+            }}>
+              <div className="preset-grid">
+                {presets.map((preset) => (
+                  <div
+                    key={preset.id}
+                    className="preset-button"
+                    onClick={() => handlePresetSelect(preset)}
                   >
-                    ✕
-                  </button>
-                </div>
-              ))}
+                    <div className="preset-content">
+                      <div className="preset-name">{preset.preset_name}</div>
+                      <div className="preset-details">
+                        {preset.preset_data.category} → {preset.preset_data.disease}
+                      </div>
+                    </div>
+                    <button
+                      className="preset-delete-btn"
+                      onClick={(e) => handleDeletePreset(preset.id, e)}
+                      title="삭제"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
-        {/* 안내 메시지 */}
-        <div className="info-notice">
-          <h4>⚠️ 중요 안내</h4>
-          <p>정확한 연령대 선택은 적절한 응급 처치를 위해 중요합니다</p>
-        </div>
+      </div>
+      
+      {/* Bottom Navigation */}
+      <div className="bottom-navigation" style={{ marginTop: 'var(--spacing-lg)' }}>
+        <button 
+          className="nav-button back" 
+          onClick={handleBack}
+          style={{
+            background: 'var(--gray-100)',
+            color: 'var(--gray-700)',
+            border: '2px solid var(--gray-300)',
+            borderRadius: 'var(--radius-md)'
+          }}
+        >
+          ← 이전
+        </button>
+        <div></div>
+        <div></div>
       </div>
     </div>
   );

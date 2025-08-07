@@ -62,9 +62,7 @@ export default function ProfileSelection() {
       <div className="header">
         <div></div>
         <h1 className="title">KTAS 응급구조시스템</h1>
-        <button className="next-button" onClick={handleViewRecords}>
-          📊 기록 보기
-        </button>
+        <div></div>
       </div>
 
       <div className="content">
@@ -280,6 +278,23 @@ export default function ProfileSelection() {
           )}
           </div>
         )}
+      </div>
+
+      {/* Bottom Navigation */}
+      <div className="bottom-navigation" style={{ marginTop: 'var(--spacing-lg)' }}>
+        <div></div>
+        <div></div>
+        <button 
+          className="nav-button records" 
+          onClick={handleViewRecords}
+          style={{
+            background: 'var(--primary)',
+            color: 'var(--white)',
+            borderRadius: 'var(--radius-md)'
+          }}
+        >
+          📊 기록 보기
+        </button>
       </div>
     </div>
   );

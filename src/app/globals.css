@@ -83,7 +83,7 @@ body {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   height: 80px;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
   background: var(--white);
   border-radius: var(--radius-xl);
   padding: 0 var(--spacing-xl);
@@ -412,30 +412,52 @@ body {
 /* 프리셋 관련 스타일 */
 .preset-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 15px;
-  max-width: 900px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+  max-width: 100%;
   margin: 0 auto;
+}
+
+/* 프리셋 스크롤 영역 스타일 */
+.preset-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.preset-grid::-webkit-scrollbar-track {
+  background: var(--gray-100);
+  border-radius: 2px;
+}
+
+.preset-grid::-webkit-scrollbar-thumb {
+  background: var(--gray-400);
+  border-radius: 2px;
+}
+
+.preset-grid::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-500);
 }
 
 .preset-button {
   position: relative;
-  background: #f8f9fa;
-  border: 2px solid #e9ecef;
-  border-radius: 12px;
-  padding: 20px;
+  background: linear-gradient(135deg, var(--white) 0%, var(--gray-50) 100%);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  z-index: 1;
 }
 
 .preset-button:hover {
-  background: #e9ecef;
-  border-color: #dee2e6;
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+  border-color: var(--primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.15);
+  z-index: 10;
 }
 
 .preset-content {
@@ -916,12 +938,22 @@ button:focus-visible {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  padding: var(--spacing-lg);
+  height: 80px;
   background: var(--white);
-  border-top: 1px solid var(--gray-200);
-  gap: var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  padding: 0 var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
   flex-shrink: 0;
   z-index: 10;
+}
+
+.bottom-navigation > *:first-child {
+  justify-self: start;
+}
+
+.bottom-navigation > *:last-child {
+  justify-self: end;
 }
 
 .nav-button {
