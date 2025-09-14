@@ -64,9 +64,16 @@ export default function Result() {
       };
 
       const rescuerId = localStorage.getItem('selectedRescuerId');
+      const finalRescuerId = rescuerId ? parseInt(rescuerId) : 1; // 기본값 1 (테스트용)
+      
+      console.log('환자 기록 저장 시도:', {
+        rescuerId: finalRescuerId,
+        patientType,
+        ktasLevel: resultData.ktasLevel
+      });
       
       const saved = await savePatientAssessment(
-        parseInt(rescuerId) || resultData.worker.id,
+        finalRescuerId,
         patientType,
         assessmentData,
         resultData.ktasLevel,
@@ -79,7 +86,10 @@ export default function Result() {
         setRecordSaved(true);
       }
     } catch (error) {
-      console.error('기록 저장 중 오류:', error);
+      console.error('환자 기록 저장 오류:', {
+        message: error.message,
+        stack: error.stack
+      });
     }
   };
 

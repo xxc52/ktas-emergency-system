@@ -20,7 +20,12 @@ export async function savePatientAssessment(rescuerId, patientType, assessmentDa
       .single();
 
     if (error) {
-      console.error('환자 기록 저장 오류:', error);
+      console.error('환자 기록 저장 오류:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       return null;
     }
 

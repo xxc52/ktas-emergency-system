@@ -18,7 +18,18 @@
       "Bash(vercel:*)",
       "Bash(mv:*)",
       "Bash(cp:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(echo $MCP_SERVERS)",
+      "Bash(claude mcp add:*)",
+      "Bash(claude mcp:*)",
+      "mcp__sequential-thinking__sequentialthinking",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Read(//e/0KoreaUniversity/DAB/llm/**)",
+      "Bash(python:*)",
+      "Bash(SET PYTHONIOENCODING=utf-8)",
+      "Bash(curl:*)",
+      "Bash(ngrok:*)"
     ],
     "deny": []
   }
