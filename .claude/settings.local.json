@@ -29,7 +29,19 @@
       "Bash(python:*)",
       "Bash(SET PYTHONIOENCODING=utf-8)",
       "Bash(curl:*)",
-      "Bash(ngrok:*)"
+      "Bash(ngrok:*)",
+      "Bash(/bashes)",
+      "WebSearch",
+      "Bash(PYTHONIOENCODING=utf-8 python medical_rag_api.py)",
+      "WebFetch(domain:78d9120902ab.ngrok-free.app)",
+      "WebFetch(domain:3f0c73cbf604.ngrok-free.app)",
+      "Bash(openssl req:*)",
+      "WebFetch(domain:8b32fa383a94.ngrok-free.app)",
+      "WebFetch(domain:994bea79dc46.ngrok-free.app)",
+      "Bash(winget install:*)",
+      "Bash(cloudflared tunnel:*)",
+      "Bash(npx localtunnel:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": []
   }
