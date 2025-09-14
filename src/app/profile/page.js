@@ -349,7 +349,8 @@ function LLMChatModal({ onClose }) {
       // For production/Vercel, try to get ngrok URL dynamically
       if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
         // Add the current ngrok URL (you'll need to update this when it changes)
-        urlsToTry.push('https://8981f930f9f7.ngrok-free.app');
+        urlsToTry.push('http://e5318e73065a.ngrok-free.app');
+        urlsToTry.push('https://e5318e73065a.ngrok-free.app');
       }
 
       for (const url of urlsToTry) {
@@ -409,7 +410,7 @@ function LLMChatModal({ onClose }) {
 
       // If no URL works, default to localhost and show error
       setApiUrl('http://localhost:8000');
-      const ngrokUrl = 'https://8981f930f9f7.ngrok-free.app';
+      const ngrokUrl = 'http://e5318e73065a.ngrok-free.app';
       setMessages(prev => [...prev, {
         type: 'error',
         content: `⚠️ API 자동 연결 실패\n\nngrok 사용시 해결 방법:\n1. 아래 버튼을 클릭하여 ngrok URL 방문\n2. "Visit Site" 버튼 클릭\n3. 이 페이지로 돌아와서 재연결\n\n또는 직접 방문: ${ngrokUrl}`,
