@@ -156,6 +156,33 @@ Uses React's built-in state management with performance optimizations:
    - Database security properly configured
    - Consistent navigation across all pages
 
+### ✅ Completed (Current Session):
+
+1. **LLM Integration & ngrok Deployment**
+
+   - FastAPI Medical RAG server integration with ChromaDB
+   - ngrok tunnel setup for external access
+   - Profile page LLM chat interface with auto-detection
+   - External deployment support via Vercel
+
+2. **Core Components Implemented:**
+
+   - **LLM Chat Modal**: Real-time medical Q&A interface with performance metrics
+   - **API Auto-Detection**: Smart URL fallback system (ngrok → localhost)
+   - **Medical RAG System**: 255,162 medical documents with BGE-M3 + Gemma3:1b
+   - **External Access**: ngrok tunnel enables global access to local LLM
+
+3. **Files Modified/Created:**
+   - `src/app/profile/page.js` - LLM chat integration with ngrok priority
+   - `E:\0KoreaUniversity\DAB\llm\*` - FastAPI server and medical RAG system
+   - `E:\0KoreaUniversity\DAB\llm\NGROK_SETUP.md` - Complete setup guide
+
+4. **System Architecture:**
+   - **FastAPI Server**: http://localhost:8000 (Medical RAG API)
+   - **ngrok Tunnel**: https://c1744335a886.ngrok-free.app (External access)
+   - **Next.js App**: http://localhost:3000 (Vercel deployable)
+   - **Auto-Fallback**: Primary ngrok → fallback localhost
+
 ### 🎯 Future Implementation Ideas:
 
 **Patient Records Dashboard Enhancement**
@@ -172,7 +199,22 @@ Uses React's built-in state management with performance optimizations:
 
 ### 🔧 Technical Notes for Next Developer:
 
+**Database & Infrastructure:**
 - Supabase URL: https://bnmlpygidqjvgmbajxfg.supabase.co
 - Dev server: `npm run dev` → http://localhost:3000 (or 3001 if 3000 occupied)
 - All original CSV logic preserved in `src/utils/ktasData.js` as backup
 - Migration scripts available in `database/` folder for reference
+
+**LLM System:**
+- FastAPI server: `python medical_rag_api.py` → http://localhost:8000
+- ngrok tunnel: `ngrok http 8000` → External access URL
+- Medical documents: 255,162 ChromaDB entries
+- Models: BGE-M3 embeddings + Gemma3:1b LLM
+- API documentation: http://localhost:8000/docs (Swagger UI)
+
+**Deployment Flow:**
+1. Start FastAPI: `cd E:\0KoreaUniversity\DAB\llm && python medical_rag_api.py`
+2. Start ngrok: `ngrok http 8000`
+3. Update `PRIMARY_URL` in `src/app/profile/page.js` with ngrok URL
+4. Deploy to Vercel: Global access to local LLM via ngrok tunnel
+5. Test via Profile → "LLM 배포 테스트" button

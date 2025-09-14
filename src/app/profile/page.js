@@ -372,9 +372,9 @@ export default function ProfileSelection() {
 
 // Configuration
 const API_CONFIG = {
-  LOCAL_URL: "http://localhost:8000",
-  // Current ngrok URL - automatically set
-  NGROK_URL: "https://c1744335a886.ngrok-free.app", // Current working ngrok URL (Updated: 2025-01-14)
+  // Primary URL - ngrok for external access
+  PRIMARY_URL: "https://c1744335a886.ngrok-free.app", // Current working ngrok URL (Updated: 2025-01-14)
+  // Fallback URLs for local development
   FALLBACK_URLS: ["http://localhost:8000"],
 };
 
@@ -398,22 +398,16 @@ function LLMChatModal({ onClose }) {
     const detectApiUrl = async () => {
       setIsConnecting(true);
 
-      // Try different URLs in order of preference
-      const urlsToTry = [...API_CONFIG.FALLBACK_URLS];
+      // Start with primary URL (ngrok), then fallback to local
+      const urlsToTry = [API_CONFIG.PRIMARY_URL, ...API_CONFIG.FALLBACK_URLS];
 
-      // Add ngrok URL if configured
-      if (API_CONFIG.NGROK_URL) {
-        urlsToTry.unshift(API_CONFIG.NGROK_URL);
-      }
-
-      // For production/Vercel, try to detect ngrok URL or use configured one
+      // For production/Vercel, check localStorage for saved ngrok URL
       if (
         typeof window !== "undefined" &&
         window.location.hostname !== "localhost"
       ) {
-        // Check localStorage for saved ngrok URL
         const savedNgrokUrl = localStorage.getItem("ngrok_url");
-        if (savedNgrokUrl) {
+        if (savedNgrokUrl && savedNgrokUrl !== API_CONFIG.PRIMARY_URL) {
           urlsToTry.unshift(savedNgrokUrl);
         }
       }
@@ -498,8 +492,8 @@ function LLMChatModal({ onClose }) {
         }
       }
 
-      // If no URL works, default to localhost and show error
-      setApiUrl(API_CONFIG.LOCAL_URL);
+      // If no URL works, default to primary URL and show error
+      setApiUrl(API_CONFIG.PRIMARY_URL);
 
       setMessages((prev) => [
         ...prev,
