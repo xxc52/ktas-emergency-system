@@ -12,6 +12,7 @@ export default function ProfileSelection() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newRescuerName, setNewRescuerName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false);
 
   // DB에서 구조대원 목록 로드
   useEffect(() => {
@@ -55,6 +56,10 @@ export default function ProfileSelection() {
 
   const handleViewRecords = () => {
     router.push("/records");
+  };
+
+  const handleLLMTest = () => {
+    setShowChatModal(true);
   };
 
   return (
@@ -283,9 +288,20 @@ export default function ProfileSelection() {
       {/* Bottom Navigation */}
       <div className="bottom-navigation" style={{ marginTop: 'var(--spacing-lg)' }}>
         <div></div>
-        <div></div>
-        <button 
-          className="nav-button records" 
+        <button
+          className="nav-button llm-test"
+          onClick={handleLLMTest}
+          style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'var(--white)',
+            borderRadius: 'var(--radius-md)',
+            fontWeight: '600'
+          }}
+        >
+          🤖 LLM 배포 테스트
+        </button>
+        <button
+          className="nav-button records"
           onClick={handleViewRecords}
           style={{
             background: 'var(--primary)',
@@ -295,6 +311,322 @@ export default function ProfileSelection() {
         >
           📊 기록 보기
         </button>
+      </div>
+
+      {/* LLM Chat Modal */}
+      {showChatModal && (
+        <LLMChatModal onClose={() => setShowChatModal(false)} />
+      )}
+    </div>
+  );
+}
+
+// LLM Chat Modal Component
+function LLMChatModal({ onClose }) {
+  const [messages, setMessages] = useState([
+    {
+      type: 'system',
+      content: '의료 AI 시스템에 연결되었습니다. 응급의학 관련 질문을 입력해보세요!',
+      timestamp: new Date().toLocaleTimeString()
+    }
+  ]);
+  const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiUrl, setApiUrl] = useState('http://localhost:8000');
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isLoading) return;
+
+    const userMessage = {
+      type: 'user',
+      content: inputValue.trim(),
+      timestamp: new Date().toLocaleTimeString()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue('');
+    setIsLoading(true);
+
+    try {
+      // LLM API 호출
+      const response = await fetch(`${apiUrl}/ask`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: userMessage.content,
+          limit: 5
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      const aiMessage = {
+        type: 'assistant',
+        content: data.answer,
+        references: data.references,
+        performance: data.performance,
+        timestamp: new Date().toLocaleTimeString()
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('LLM API Error:', error);
+      const errorMessage = {
+        type: 'error',
+        content: `오류가 발생했습니다: ${error.message}\n\n서버가 실행 중인지 확인하세요 (${apiUrl})`,
+        timestamp: new Date().toLocaleTimeString()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 10000,
+      padding: 'var(--spacing-lg)'
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: 'var(--radius-lg)',
+        width: '90%',
+        maxWidth: '800px',
+        height: '80%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
+      }}>
+        {/* Header */}
+        <div style={{
+          padding: 'var(--spacing-lg)',
+          borderBottom: '1px solid var(--gray-200)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white'
+        }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '700' }}>
+              🤖 의료 LLM 배포 테스트
+            </h3>
+            <p style={{ margin: '4px 0 0 0', fontSize: '14px', opacity: 0.9 }}>
+              API: {apiUrl}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'rgba(255,255,255,0.2)',
+              border: 'none',
+              color: 'white',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              cursor: 'pointer',
+              fontSize: '18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* API URL 설정 */}
+        <div style={{
+          padding: 'var(--spacing-md)',
+          borderBottom: '1px solid var(--gray-200)',
+          backgroundColor: 'var(--gray-50)'
+        }}>
+          <label style={{ fontSize: '14px', color: 'var(--gray-700)', marginBottom: '4px', display: 'block' }}>
+            API 서버 URL:
+          </label>
+          <input
+            type="text"
+            value={apiUrl}
+            onChange={(e) => setApiUrl(e.target.value)}
+            placeholder="http://localhost:8000 또는 ngrok URL"
+            style={{
+              width: '100%',
+              padding: 'var(--spacing-sm)',
+              fontSize: '14px',
+              border: '1px solid var(--gray-300)',
+              borderRadius: 'var(--radius-sm)',
+              fontFamily: 'monospace'
+            }}
+          />
+        </div>
+
+        {/* Messages */}
+        <div style={{
+          flex: 1,
+          padding: 'var(--spacing-lg)',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--spacing-md)'
+        }}>
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              style={{
+                alignSelf: message.type === 'user' ? 'flex-end' : 'flex-start',
+                maxWidth: '80%'
+              }}
+            >
+              <div style={{
+                padding: 'var(--spacing-md)',
+                borderRadius: 'var(--radius-md)',
+                backgroundColor:
+                  message.type === 'user' ? 'var(--primary)' :
+                  message.type === 'error' ? 'var(--error)' :
+                  message.type === 'system' ? 'var(--gray-100)' :
+                  'var(--gray-50)',
+                color:
+                  message.type === 'user' || message.type === 'error' ? 'white' :
+                  'var(--gray-900)',
+                whiteSpace: 'pre-wrap',
+                fontSize: '14px',
+                lineHeight: '1.5'
+              }}>
+                {message.content}
+                {message.references && (
+                  <div style={{
+                    marginTop: 'var(--spacing-sm)',
+                    paddingTop: 'var(--spacing-sm)',
+                    borderTop: '1px solid var(--gray-300)',
+                    fontSize: '12px',
+                    opacity: 0.8
+                  }}>
+                    <strong>참고문서:</strong>
+                    <ul style={{ margin: '4px 0', paddingLeft: '16px' }}>
+                      {message.references.map((ref, idx) => (
+                        <li key={idx}>{ref}</li>
+                      ))}
+                    </ul>
+                    {message.performance && (
+                      <div style={{ marginTop: '4px' }}>
+                        <strong>성능:</strong> 총 {message.performance.total_time?.toFixed(2)}초
+                        (검색: {message.performance.search_time?.toFixed(2)}초,
+                        LLM: {message.performance.llm_time?.toFixed(2)}초)
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div style={{
+                fontSize: '12px',
+                color: 'var(--gray-500)',
+                textAlign: message.type === 'user' ? 'right' : 'left',
+                marginTop: '4px'
+              }}>
+                {message.timestamp}
+              </div>
+            </div>
+          ))}
+          {isLoading && (
+            <div style={{ alignSelf: 'flex-start', maxWidth: '80%' }}>
+              <div style={{
+                padding: 'var(--spacing-md)',
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--gray-50)',
+                color: 'var(--gray-600)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--spacing-sm)'
+              }}>
+                <div style={{
+                  width: '16px',
+                  height: '16px',
+                  border: '2px solid var(--gray-300)',
+                  borderTop: '2px solid var(--primary)',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }}></div>
+                AI가 답변을 생성하고 있습니다...
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Input */}
+        <div style={{
+          padding: 'var(--spacing-lg)',
+          borderTop: '1px solid var(--gray-200)',
+          backgroundColor: 'white'
+        }}>
+          <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+            <textarea
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="의료 관련 질문을 입력하세요... (예: 심폐소생술 시 가슴압박 깊이는?)"
+              disabled={isLoading}
+              style={{
+                flex: 1,
+                padding: 'var(--spacing-md)',
+                fontSize: '14px',
+                border: '1px solid var(--gray-300)',
+                borderRadius: 'var(--radius-md)',
+                resize: 'none',
+                minHeight: '60px',
+                fontFamily: 'inherit'
+              }}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputValue.trim() || isLoading}
+              style={{
+                padding: '0 var(--spacing-lg)',
+                fontSize: '14px',
+                fontWeight: '600',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                cursor: !inputValue.trim() || isLoading ? 'not-allowed' : 'pointer',
+                opacity: !inputValue.trim() || isLoading ? 0.6 : 1,
+                minWidth: '80px'
+              }}
+            >
+              {isLoading ? '전송중...' : '전송'}
+            </button>
+          </div>
+          <div style={{
+            marginTop: 'var(--spacing-sm)',
+            fontSize: '12px',
+            color: 'var(--gray-500)',
+            textAlign: 'center'
+          }}>
+            Enter로 전송 | Shift+Enter로 줄바꿈
+          </div>
+        </div>
       </div>
     </div>
   );
