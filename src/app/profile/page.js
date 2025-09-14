@@ -332,7 +332,59 @@ function LLMChatModal({ onClose }) {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [apiUrl, setApiUrl] = useState('http://localhost:8000');
+  const [apiUrl, setApiUrl] = useState('');
+  const [isConnecting, setIsConnecting] = useState(true);
+
+  // Auto-detect API URL on mount
+  useEffect(() => {
+    const detectApiUrl = async () => {
+      setIsConnecting(true);
+
+      // Try different URLs in order of preference
+      const urlsToTry = [
+        'http://localhost:8000',
+        'https://8981f930f9f7.ngrok-free.app' // Current ngrok URL - you can update this
+      ];
+
+      for (const url of urlsToTry) {
+        try {
+          console.log(`Testing API URL: ${url}`);
+          const response = await fetch(`${url}/health`, {
+            method: 'GET',
+            headers: {
+              'ngrok-skip-browser-warning': 'any'
+            },
+            signal: AbortSignal.timeout(5000) // 5 second timeout
+          });
+
+          if (response.ok) {
+            setApiUrl(url);
+            console.log(`API connected: ${url}`);
+            setMessages(prev => [...prev, {
+              type: 'system',
+              content: `✅ API 연결 성공: ${url}`,
+              timestamp: new Date().toLocaleTimeString()
+            }]);
+            setIsConnecting(false);
+            return;
+          }
+        } catch (error) {
+          console.log(`Failed to connect to ${url}:`, error.message);
+        }
+      }
+
+      // If no URL works, default to localhost and show error
+      setApiUrl('http://localhost:8000');
+      setMessages(prev => [...prev, {
+        type: 'error',
+        content: '⚠️ API 자동 연결 실패. URL을 수동으로 설정하거나 서버 상태를 확인하세요.',
+        timestamp: new Date().toLocaleTimeString()
+      }]);
+      setIsConnecting(false);
+    };
+
+    detectApiUrl();
+  }, []);
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -348,23 +400,36 @@ function LLMChatModal({ onClose }) {
     setIsLoading(true);
 
     try {
+      console.log(`Sending request to: ${apiUrl}/ask`);
+      console.log(`Request payload:`, {
+        question: userMessage.content,
+        limit: 5
+      });
+
       // LLM API 호출
       const response = await fetch(`${apiUrl}/ask`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'any'
         },
         body: JSON.stringify({
           question: userMessage.content,
           limit: 5
-        })
+        }),
+        signal: AbortSignal.timeout(30000) // 30 second timeout
       });
 
+      console.log(`Response status: ${response.status} ${response.statusText}`);
+
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error(`API Error Response:`, errorText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}\n\nResponse: ${errorText}`);
       }
 
       const data = await response.json();
+      console.log(`API Response:`, data);
 
       const aiMessage = {
         type: 'assistant',
@@ -377,9 +442,17 @@ function LLMChatModal({ onClose }) {
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
       console.error('LLM API Error:', error);
+      let errorContent = `오류가 발생했습니다: ${error.message}`;
+
+      if (error.name === 'AbortError') {
+        errorContent = `요청 시간 초과: API 응답이 30초를 초과했습니다.`;
+      } else if (error.message.includes('Failed to fetch')) {
+        errorContent = `연결 실패: ${apiUrl}에 연결할 수 없습니다.\n\n가능한 원인:\n- 서버가 실행되지 않음\n- CORS 정책 위반\n- 네트워크 연결 문제\n- ngrok 터널 만료`;
+      }
+
       const errorMessage = {
         type: 'error',
-        content: `오류가 발생했습니다: ${error.message}\n\n서버가 실행 중인지 확인하세요 (${apiUrl})`,
+        content: `${errorContent}\n\n디버깅 정보:\n- API URL: ${apiUrl}\n- 시간: ${new Date().toISOString()}\n- 브라우저: ${navigator.userAgent.split(' ')[0]}`,
         timestamp: new Date().toLocaleTimeString()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -464,9 +537,40 @@ function LLMChatModal({ onClose }) {
           borderBottom: '1px solid var(--gray-200)',
           backgroundColor: 'var(--gray-50)'
         }}>
-          <label style={{ fontSize: '14px', color: 'var(--gray-700)', marginBottom: '4px', display: 'block' }}>
-            API 서버 URL:
-          </label>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <label style={{ fontSize: '14px', color: 'var(--gray-700)' }}>
+              API 서버 URL:
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {isConnecting && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <div style={{
+                    width: '12px',
+                    height: '12px',
+                    border: '2px solid var(--gray-300)',
+                    borderTop: '2px solid var(--primary)',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}></div>
+                  <span style={{ fontSize: '12px', color: 'var(--gray-600)' }}>연결 중...</span>
+                </div>
+              )}
+              <button
+                onClick={() => window.location.reload()}
+                style={{
+                  background: 'none',
+                  border: '1px solid var(--gray-300)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '4px 8px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  color: 'var(--gray-600)'
+                }}
+              >
+                🔄 재연결
+              </button>
+            </div>
+          </div>
           <input
             type="text"
             value={apiUrl}
@@ -481,6 +585,13 @@ function LLMChatModal({ onClose }) {
               fontFamily: 'monospace'
             }}
           />
+          <div style={{
+            marginTop: '4px',
+            fontSize: '11px',
+            color: 'var(--gray-500)'
+          }}>
+            💡 URL 변경 후 Enter를 누르거나 재연결 버튼을 클릭하세요
+          </div>
         </div>
 
         {/* Messages */}
