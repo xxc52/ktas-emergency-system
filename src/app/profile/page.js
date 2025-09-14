@@ -321,6 +321,16 @@ export default function ProfileSelection() {
   );
 }
 
+// Configuration
+const API_CONFIG = {
+  LOCAL_URL: 'http://localhost:8000',
+  // ngrok.io domain supports both HTTP and HTTPS unlike ngrok-free.app
+  NGROK_URL: '', // Will be set dynamically or manually
+  FALLBACK_URLS: [
+    'http://localhost:8000'
+  ]
+};
+
 // LLM Chat Modal Component
 function LLMChatModal({ onClose }) {
   const [messages, setMessages] = useState([
@@ -341,16 +351,20 @@ function LLMChatModal({ onClose }) {
       setIsConnecting(true);
 
       // Try different URLs in order of preference
-      const urlsToTry = [
-        'http://localhost:8000'
-        // Note: ngrok URLs need special handling for free accounts
-      ];
+      const urlsToTry = [...API_CONFIG.FALLBACK_URLS];
 
-      // For production/Vercel, try to get ngrok URL dynamically
+      // Add ngrok URL if configured
+      if (API_CONFIG.NGROK_URL) {
+        urlsToTry.unshift(API_CONFIG.NGROK_URL);
+      }
+
+      // For production/Vercel, try to detect ngrok URL or use configured one
       if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-        // Add the current ngrok URL (you'll need to update this when it changes)
-        urlsToTry.push('http://e5318e73065a.ngrok-free.app');
-        urlsToTry.push('https://e5318e73065a.ngrok-free.app');
+        // Check localStorage for saved ngrok URL
+        const savedNgrokUrl = localStorage.getItem('ngrok_url');
+        if (savedNgrokUrl) {
+          urlsToTry.unshift(savedNgrokUrl);
+        }
       }
 
       for (const url of urlsToTry) {
@@ -384,6 +398,12 @@ function LLMChatModal({ onClose }) {
 
             setApiUrl(url);
             console.log(`API connected: ${url}`);
+
+            // Save ngrok URL to localStorage if it's not localhost
+            if (url.includes('ngrok')) {
+              localStorage.setItem('ngrok_url', url);
+            }
+
             setMessages(prev => [...prev, {
               type: 'system',
               content: `✅ API 연결 성공: ${url}\n상태: ${data.status || 'healthy'}`,
@@ -409,14 +429,13 @@ function LLMChatModal({ onClose }) {
       }
 
       // If no URL works, default to localhost and show error
-      setApiUrl('http://localhost:8000');
-      const ngrokUrl = 'http://e5318e73065a.ngrok-free.app';
+      setApiUrl(API_CONFIG.LOCAL_URL);
+
       setMessages(prev => [...prev, {
         type: 'error',
-        content: `⚠️ API 자동 연결 실패\n\nngrok 사용시 해결 방법:\n1. 아래 버튼을 클릭하여 ngrok URL 방문\n2. "Visit Site" 버튼 클릭\n3. 이 페이지로 돌아와서 재연결\n\n또는 직접 방문: ${ngrokUrl}`,
+        content: `⚠️ API 자동 연결 실패\n\nngrok 사용시 단계:\n1. 로컬에서 서버 실행: python medical_rag_api.py\n2. ngrok 실행: ngrok http 8000 --domain=custom.ngrok.io\n3. 새 URL을 아래 입력창에 붙여넣기\n\n주의: .ngrok-free.app 도메인은 SSL 에러 발생`,
         timestamp: new Date().toLocaleTimeString(),
-        showNgrokButton: true,
-        ngrokUrl: ngrokUrl
+        showNgrokSetup: true
       }]);
       setIsConnecting(false);
     };
@@ -665,42 +684,62 @@ function LLMChatModal({ onClose }) {
                 lineHeight: '1.5'
               }}>
                 {message.content}
-                {message.showNgrokButton && (
+                {message.showNgrokSetup && (
                   <div style={{
                     marginTop: 'var(--spacing-md)',
-                    display: 'flex',
-                    gap: 'var(--spacing-sm)'
+                    padding: 'var(--spacing-md)',
+                    backgroundColor: 'var(--gray-50)',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--gray-200)'
                   }}>
-                    <button
-                      onClick={() => window.open(message.ngrokUrl, '_blank')}
-                      style={{
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: 'var(--radius-sm)',
-                        padding: 'var(--spacing-sm) var(--spacing-md)',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      🌐 ngrok URL 방문하기
-                    </button>
-                    <button
-                      onClick={() => setApiUrl(message.ngrokUrl)}
-                      style={{
-                        background: 'var(--primary)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: 'var(--radius-sm)',
-                        padding: 'var(--spacing-sm) var(--spacing-md)',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      🔗 URL 설정하기
-                    </button>
+                    <div style={{ fontSize: '12px', color: 'var(--gray-700)', marginBottom: '8px' }}>
+                      💡 ngrok URL을 입력하고 테스트하세요:
+                    </div>
+                    <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+                      <input
+                        type="text"
+                        placeholder="예: http://abc123.ngrok.io"
+                        style={{
+                          flex: 1,
+                          padding: 'var(--spacing-sm)',
+                          fontSize: '12px',
+                          border: '1px solid var(--gray-300)',
+                          borderRadius: 'var(--radius-sm)',
+                          fontFamily: 'monospace'
+                        }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            const url = e.target.value.trim();
+                            if (url) {
+                              setApiUrl(url);
+                              localStorage.setItem('ngrok_url', url);
+                            }
+                          }
+                        }}
+                      />
+                      <button
+                        onClick={(e) => {
+                          const input = e.target.previousElementSibling;
+                          const url = input.value.trim();
+                          if (url) {
+                            setApiUrl(url);
+                            localStorage.setItem('ngrok_url', url);
+                          }
+                        }}
+                        style={{
+                          background: 'var(--primary)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: 'var(--radius-sm)',
+                          padding: 'var(--spacing-sm) var(--spacing-md)',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        설정
+                      </button>
+                    </div>
                   </div>
                 )}
                 {message.references && (
