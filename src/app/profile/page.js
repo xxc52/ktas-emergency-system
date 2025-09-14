@@ -342,43 +342,80 @@ function LLMChatModal({ onClose }) {
 
       // Try different URLs in order of preference
       const urlsToTry = [
-        'http://localhost:8000',
-        'https://8981f930f9f7.ngrok-free.app' // Current ngrok URL - you can update this
+        'http://localhost:8000'
+        // Note: ngrok URLs need special handling for free accounts
       ];
+
+      // For production/Vercel, try to get ngrok URL dynamically
+      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+        // Add the current ngrok URL (you'll need to update this when it changes)
+        urlsToTry.push('https://8981f930f9f7.ngrok-free.app');
+      }
 
       for (const url of urlsToTry) {
         try {
           console.log(`Testing API URL: ${url}`);
+
+          // Special handling for ngrok URLs
+          const isNgrokUrl = url.includes('ngrok');
+          const headers = {
+            'Content-Type': 'application/json'
+          };
+
+          if (isNgrokUrl) {
+            headers['ngrok-skip-browser-warning'] = 'any';
+            headers['User-Agent'] = 'Mozilla/5.0 (compatible; API-Client)';
+          }
+
           const response = await fetch(`${url}/health`, {
             method: 'GET',
-            headers: {
-              'ngrok-skip-browser-warning': 'any'
-            },
-            signal: AbortSignal.timeout(5000) // 5 second timeout
+            headers: headers,
+            mode: 'cors',
+            credentials: 'omit',
+            signal: AbortSignal.timeout(8000) // 8 second timeout for ngrok
           });
 
+          console.log(`Response for ${url}:`, response.status, response.statusText);
+
           if (response.ok) {
+            const data = await response.json();
+            console.log(`Health check data:`, data);
+
             setApiUrl(url);
             console.log(`API connected: ${url}`);
             setMessages(prev => [...prev, {
               type: 'system',
-              content: `✅ API 연결 성공: ${url}`,
+              content: `✅ API 연결 성공: ${url}\n상태: ${data.status || 'healthy'}`,
               timestamp: new Date().toLocaleTimeString()
             }]);
             setIsConnecting(false);
             return;
+          } else {
+            console.log(`HTTP ${response.status} for ${url}`);
           }
         } catch (error) {
-          console.log(`Failed to connect to ${url}:`, error.message);
+          console.log(`Failed to connect to ${url}:`, error.name, error.message);
+
+          // For ngrok URLs, provide specific guidance
+          if (url.includes('ngrok') && error.message.includes('Failed to fetch')) {
+            setMessages(prev => [...prev, {
+              type: 'error',
+              content: `🚨 ngrok URL 연결 실패: ${url}\n\n해결 방법:\n1. 브라우저에서 ${url} 직접 방문\n2. "Visit Site" 클릭하여 경고 페이지 통과\n3. 다시 시도하세요`,
+              timestamp: new Date().toLocaleTimeString()
+            }]);
+          }
         }
       }
 
       // If no URL works, default to localhost and show error
       setApiUrl('http://localhost:8000');
+      const ngrokUrl = 'https://8981f930f9f7.ngrok-free.app';
       setMessages(prev => [...prev, {
         type: 'error',
-        content: '⚠️ API 자동 연결 실패. URL을 수동으로 설정하거나 서버 상태를 확인하세요.',
-        timestamp: new Date().toLocaleTimeString()
+        content: `⚠️ API 자동 연결 실패\n\nngrok 사용시 해결 방법:\n1. 아래 버튼을 클릭하여 ngrok URL 방문\n2. "Visit Site" 버튼 클릭\n3. 이 페이지로 돌아와서 재연결\n\n또는 직접 방문: ${ngrokUrl}`,
+        timestamp: new Date().toLocaleTimeString(),
+        showNgrokButton: true,
+        ngrokUrl: ngrokUrl
       }]);
       setIsConnecting(false);
     };
@@ -627,6 +664,44 @@ function LLMChatModal({ onClose }) {
                 lineHeight: '1.5'
               }}>
                 {message.content}
+                {message.showNgrokButton && (
+                  <div style={{
+                    marginTop: 'var(--spacing-md)',
+                    display: 'flex',
+                    gap: 'var(--spacing-sm)'
+                  }}>
+                    <button
+                      onClick={() => window.open(message.ngrokUrl, '_blank')}
+                      style={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: 'var(--spacing-sm) var(--spacing-md)',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🌐 ngrok URL 방문하기
+                    </button>
+                    <button
+                      onClick={() => setApiUrl(message.ngrokUrl)}
+                      style={{
+                        background: 'var(--primary)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: 'var(--spacing-sm) var(--spacing-md)',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🔗 URL 설정하기
+                    </button>
+                  </div>
+                )}
                 {message.references && (
                   <div style={{
                     marginTop: 'var(--spacing-sm)',
