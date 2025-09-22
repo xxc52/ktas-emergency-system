@@ -373,7 +373,7 @@ export default function ProfileSelection() {
 // Configuration
 const API_CONFIG = {
   // Primary URL - ngrok for external access
-  PRIMARY_URL: "https://c1744335a886.ngrok-free.app", // Current working ngrok URL (Updated: 2025-01-14)
+  PRIMARY_URL: "https://ac64423f751c.ngrok-free.app", // Current working ngrok URL (Updated: 2025-09-22)
   // Fallback URLs for local development
   FALLBACK_URLS: ["http://localhost:8000"],
 };
