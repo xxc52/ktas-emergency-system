@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { savePatientAssessment } from '../../utils/patientRecordsSupabase';
+import Timer from './components/Timer';
+import PatientInfo from './components/PatientInfo';
+import LeafletMap from './components/KakaoMap';
+import HospitalListLevel1to4 from './components/HospitalListLevel1to4';
+import HospitalListLevel5 from './components/HospitalListLevel5';
 
 const ktasColors = {
   1: '#FF0000', // Red - 즉시
@@ -24,15 +29,43 @@ export default function Result() {
   const router = useRouter();
   const [result, setResult] = useState(null);
   const [recordSaved, setRecordSaved] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [hospitals, setHospitals] = useState([]);
 
   useEffect(() => {
     const savedResult = localStorage.getItem('ktasResult');
     if (savedResult) {
       const resultData = JSON.parse(savedResult);
       setResult(resultData);
-      
+
       // 자동으로 환자 기록 저장
       saveRecord(resultData);
+    }
+
+    // 현재 위치 가져오기
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCurrentLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error('위치 정보를 가져올 수 없습니다:', error);
+          // 기본 위치 설정 (예: 고려대학교 서울캠퍼스)
+          setCurrentLocation({
+            lat: 37.5896,
+            lng: 127.0321
+          });
+        }
+      );
+    } else {
+      // 기본 위치 설정
+      setCurrentLocation({
+        lat: 37.5896,
+        lng: 127.0321
+      });
     }
   }, []);
 
@@ -93,13 +126,14 @@ export default function Result() {
     }
   };
 
-  const handleStartOver = () => {
-    // Clear all stored data
+  const handleEndSituation = () => {
+    // 상황 종료 시 데이터 정리 및 처음으로 이동
     localStorage.removeItem('selectedWorker');
     localStorage.removeItem('selectedRescuerId');
     localStorage.removeItem('selectedAge');
     localStorage.removeItem('ktasResult');
     localStorage.removeItem('recordSaved');
+    localStorage.removeItem('ktasTimer');
     router.push('/profile');
   };
 
@@ -114,136 +148,61 @@ export default function Result() {
 
   if (!result) {
     return (
-      <div className="container">
-        <div className="content" style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <div>Loading result...</div>
-        </div>
+      <div className="loading-container">
+        <div className="loading">데이터 로딩 중...</div>
       </div>
     );
   }
 
+  const ktasLevel = result.ktasLevel || 3;
+
   return (
-    <div className="container">
-      <div className="header">
-        <button className="back-button" onClick={handleBack}>
-          ← 이전
-        </button>
-        <h1 className="title">KTAS 평가 결과</h1>
-        <button className="next-button" onClick={handleStartOver}>
-          새로 시작
-        </button>
-      </div>
-      
-      <div className="content">
-        {result.worker && (
-          <div className="current-user">
-            평가자: {result.worker.name} ({result.worker.role})
+    <div className="result-container">
+      {/* 상단바 */}
+      <header className="result-header">
+        <div className="header-left">
+          <span className="emergency-system-title">🚨 응급 구조 시스템</span>
+        </div>
+        <div className="header-right">
+          <Timer />
+          <button
+            className="end-situation-btn"
+            onClick={handleEndSituation}
+          >
+            상황 종료
+          </button>
+        </div>
+      </header>
+
+      {/* 메인 콘텐츠 */}
+      <div className="result-main">
+        {/* 왼쪽 영역: 진단 정보 + 지도 */}
+        <div className="result-left">
+          <PatientInfo
+            patientData={result}
+            ktasColors={ktasColors}
+            ktasLabels={ktasLabels}
+          />
+          <div className="map-container">
+            <LeafletMap currentLocation={currentLocation} hospitals={hospitals} />
           </div>
-        )}
+        </div>
 
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: '30px',
-          height: '100%',
-          padding: '20px 0'
-        }}>
-          {/* KTAS Level Display */}
-          {result.ktasLevel && (
-            <div style={{
-              backgroundColor: ktasColors[result.ktasLevel],
-              color: result.ktasLevel === 3 ? '#000' : '#fff',
-              padding: '40px',
-              borderRadius: '20px',
-              textAlign: 'center',
-              fontSize: '48px',
-              fontWeight: 'bold',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-            }}>
-              KTAS {result.ktasLevel}급
-              <div style={{ fontSize: '24px', marginTop: '10px' }}>
-                {ktasLabels[result.ktasLevel]}
-              </div>
-            </div>
-          )}
-
-          {/* Disease Information */}
-          <div style={{
-            backgroundColor: 'white',
-            padding: '30px',
-            borderRadius: '15px',
-            border: '2px solid #ddd'
-          }}>
-            <h3 style={{ fontSize: '24px', marginBottom: '20px', color: '#333' }}>
-              진단 정보
-            </h3>
-            
-            <div style={{ display: 'grid', gap: '15px' }}>
-              <div>
-                <strong>구분:</strong> {result.category || 'N/A'}
-              </div>
-              <div>
-                <strong>주요 병명:</strong> {result.primaryDisease || result.disease || 'N/A'}
-              </div>
-              {result.diseases && result.diseases.length > 1 && (
-                <div>
-                  <strong>기타 선택된 병명:</strong> {result.diseases.filter(d => d !== result.primaryDisease).join(', ')}
-                </div>
-              )}
-              {result.firstConsiderations && result.firstConsiderations.length > 0 && (
-                <div>
-                  <strong>1차 고려사항:</strong> {result.firstConsiderations.join(', ')}
-                </div>
-              )}
-              {result.firstConsideration && (
-                <div>
-                  <strong>1차 고려사항:</strong> {result.firstConsideration}
-                </div>
-              )}
-              {result.secondConsiderations && result.secondConsiderations.length > 0 && (
-                <div>
-                  <strong>2차 고려사항:</strong> {result.secondConsiderations.join(', ')}
-                </div>
-              )}
-              {result.secondConsideration && (
-                <div>
-                  <strong>2차 고려사항:</strong> {result.secondConsideration}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Special message for pediatric */}
-          {result.ageType === 'pediatric' && (
-            <div style={{
-              backgroundColor: '#f0f8ff',
-              padding: '30px',
-              borderRadius: '15px',
-              border: '2px solid #007AFF',
-              textAlign: 'center'
-            }}>
-              <p style={{ fontSize: '18px', color: '#333' }}>
-                {result.message}
-              </p>
-            </div>
-          )}
-
-          {/* Next Steps */}
-          {result.ktasLevel && (
-            <div style={{
-              backgroundColor: '#f8f9fa',
-              padding: '25px',
-              borderRadius: '15px',
-              border: '2px solid #e9ecef'
-            }}>
-              <h4 style={{ fontSize: '20px', marginBottom: '15px', color: '#333' }}>
-                다음 단계
-              </h4>
-              <p style={{ fontSize: '16px', color: '#666', lineHeight: '1.5' }}>
-                이 결과를 바탕으로 적합한 병원을 검색하고 이송 계획을 수립하세요.
-                병원 검색 및 이송 계획 기능은 추후 구현될 예정입니다.
-              </p>
-            </div>
+        {/* 오른쪽 영역: 병원 리스트 */}
+        <div className="result-right">
+          <h2 className="hospital-list-title">추천 병원 리스트 (실시간)</h2>
+          {ktasLevel === 5 ? (
+            <HospitalListLevel5
+              currentLocation={currentLocation}
+              patientData={result}
+              onHospitalsUpdate={setHospitals}
+            />
+          ) : (
+            <HospitalListLevel1to4
+              currentLocation={currentLocation}
+              patientData={result}
+              ktasLevel={ktasLevel}
+            />
           )}
         </div>
       </div>

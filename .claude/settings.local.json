@@ -41,7 +41,14 @@
       "Bash(winget install:*)",
       "Bash(cloudflared tunnel:*)",
       "Bash(npx localtunnel:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "WebFetch(domain:apis.map.kakao.com)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(dir:*)",
+      "Bash(timeout:*)",
+      "Bash(PYTHONIOENCODING=utf-8 python debug_test.py)",
+      "Bash(PYTHONIOENCODING=utf-8 python debug_search.py)"
     ],
     "deny": []
   }

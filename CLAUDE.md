@@ -158,30 +158,39 @@ Uses React's built-in state management with performance optimizations:
 
 ### ✅ Completed (Current Session):
 
-1. **LLM Integration & ngrok Deployment**
+1. **KTAS 5급 환자 병원 검색 시스템 완료**
 
-   - FastAPI Medical RAG server integration with ChromaDB
-   - ngrok tunnel setup for external access
-   - Profile page LLM chat interface with auto-detection
-   - External deployment support via Vercel
+   - LLM 기반 진료과목 코드 자동 판단 시스템
+   - 국립중앙의료원 Open API 연동으로 실시간 병원 검색
+   - 거리순 정렬 및 지도 마커 표시
+   - 완전한 rule-based 제거 및 LLM 전용 판단
 
-2. **Core Components Implemented:**
+2. **핵심 기능 구현:**
 
-   - **LLM Chat Modal**: Real-time medical Q&A interface with performance metrics
-   - **API Auto-Detection**: Smart URL fallback system (ngrok → localhost)
-   - **Medical RAG System**: 255,162 medical documents with BGE-M3 + Gemma3:1b
-   - **External Access**: ngrok tunnel enables global access to local LLM
+   - **LLM 진료과목 판단**: 환자 정보(KTAS급수, 주요병명, 고려사항) → 진료과목 코드 (D001-D026)
+   - **병원 API 통합**: 국립중앙의료원 API로 실시간 병원 데이터 검색
+   - **거리순 정렬**: Haversine 공식으로 현재위치 기준 거리계산 후 상위 20개 병원 표시
+   - **지도 연동**: Leaflet 지도에 병원 마커 및 상세 정보 팝업
 
-3. **Files Modified/Created:**
-   - `src/app/profile/page.js` - LLM chat integration with ngrok priority
-   - `E:\0KoreaUniversity\DAB\llm\*` - FastAPI server and medical RAG system
-   - `E:\0KoreaUniversity\DAB\llm\NGROK_SETUP.md` - Complete setup guide
+3. **LLM 시스템 개선:**
+   - 해부학적 위치 기반 판단 로직 (귀→이비인후과, 눈→안과 등)
+   - 의료 전문성 고려한 프롬프트 엔지니어링
+   - 구조화된 환자 데이터 처리 (`ask_unified_json` 메서드 개선)
+   - 강화된 진료과목 코드 파싱 (정규표현식 기반)
 
-4. **System Architecture:**
-   - **FastAPI Server**: http://localhost:8000 (Medical RAG API)
-   - **ngrok Tunnel**: https://c1744335a886.ngrok-free.app (External access)
-   - **Next.js App**: http://localhost:3000 (Vercel deployable)
-   - **Auto-Fallback**: Primary ngrok → fallback localhost
+4. **Files Modified/Created:**
+   - `src/utils/llmService.js` - LLM API 통신 및 진료과목 판단
+   - `src/utils/hospitalApi.js` - 병원 API 통합 및 거리 계산
+   - `src/app/result/components/HospitalListLevel5.js` - KTAS 5급 환자용 병원 목록
+   - `src/app/result/components/KakaoMap.js` - 병원 지도 마커 및 팝업
+   - `E:\0KoreaUniversity\DAB\llm\medical_rag_chromadb_final.py` - LLM 환자 데이터 처리 개선
+   - `E:\0KoreaUniversity\DAB\llm\medical_rag_api.py` - FastAPI 진료과목 판단 엔드포인트
+
+5. **검증된 기능:**
+   - **LLM 판단 정확성**: "귀의 이물질" → D013 (이비인후과) ✅
+   - **병원 검색**: 서울/경기 지역 실시간 병원 데이터 ✅
+   - **거리 계산**: GPS 기반 정확한 거리 측정 ✅
+   - **UI 표시**: 병원 정보, 진료과목 태그, 운영상태 ✅
 
 ### 🎯 Future Implementation Ideas:
 
