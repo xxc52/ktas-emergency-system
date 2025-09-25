@@ -2,12 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { savePatientAssessment } from '../../utils/patientRecordsSupabase';
 import Timer from './components/Timer';
 import PatientInfo from './components/PatientInfo';
-import LeafletMap from './components/KakaoMap';
 import HospitalListLevel1to4 from './components/HospitalListLevel1to4';
 import HospitalListLevel5 from './components/HospitalListLevel5';
+
+// Leaflet 지도 컴포넌트를 dynamic import로 로드 (SSR 비활성화)
+const LeafletMap = dynamic(
+  () => import('./components/KakaoMap'),
+  {
+    ssr: false,
+    loading: () => <div className="w-full h-full bg-gray-100 animate-pulse rounded-lg" />
+  }
+);
 
 const ktasColors = {
   1: '#FF0000', // Red - 즉시

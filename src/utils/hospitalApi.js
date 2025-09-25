@@ -306,9 +306,11 @@ export function getHospitalStatus(hospital, currentTime = new Date()) {
   };
 }
 
-export default {
+const hospitalApi = {
   searchHospitalsByDepartment,
   searchAndSortHospitals,
   getHospitalStatus,
   formatDistance: formatDistance
 };
+
+export default hospitalApi;

@@ -16,6 +16,7 @@ export default function HospitalListLevel5({ currentLocation, patientData, onHos
     }
 
     searchOptimalHospitals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientData, currentLocation]);
 
   const searchOptimalHospitals = async () => {

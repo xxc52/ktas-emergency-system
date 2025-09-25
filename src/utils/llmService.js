@@ -159,9 +159,11 @@ export function calculateDistance(lat1, lng1, lat2, lng2) {
   return R * c;
 }
 
-export default {
+const llmService = {
   checkLLMHealth,
   determineDepartmentCode,
   getRegionsForSearch,
   calculateDistance
 };
+
+export default llmService;
