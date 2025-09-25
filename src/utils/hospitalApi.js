@@ -8,6 +8,7 @@ import { calculateDistance } from './llmService';
 // API 설정
 const HOSPITAL_API_CONFIG = {
   BASE_URL: 'http://apis.data.go.kr/B552657/HsptlAsembySearchService/getHsptlMdcncListInfoInqire',
+  PROXY_URL: '/api/hospital-proxy', // Vercel 프록시 API
   SERVICE_KEY: '4d3689cde20aee7c9a462d2fe3a3bf435084a21af9e13b71c30d6ecb21168c0f',
   DEFAULT_NUM_OF_ROWS: 1000, // 최대 검색 건수
   TIMEOUT: 15000, // 15초 타임아웃
@@ -23,17 +24,31 @@ export async function searchHospitalsByDepartment(region, departmentCode) {
   try {
     console.log(`병원 검색 요청: ${region}, ${departmentCode}`);
 
-    const params = new URLSearchParams({
-      ServiceKey: HOSPITAL_API_CONFIG.SERVICE_KEY,
-      Q0: region,
-      QD: departmentCode,
-      numOfRows: HOSPITAL_API_CONFIG.DEFAULT_NUM_OF_ROWS,
-      pageNo: 1,
-      _type: 'json'
-    });
+    // Vercel 환경에서는 프록시 사용, 로컬에서는 직접 호출
+    const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 
-    const url = `${HOSPITAL_API_CONFIG.BASE_URL}?${params.toString()}`;
-    console.log('API 요청 URL:', url);
+    let url;
+    if (isProduction) {
+      // Vercel 환경: 프록시 API 사용
+      const params = new URLSearchParams({
+        region: region,
+        departmentCode: departmentCode
+      });
+      url = `${HOSPITAL_API_CONFIG.PROXY_URL}?${params.toString()}`;
+      console.log('Proxy API 요청 URL:', url);
+    } else {
+      // 로컬 환경: 직접 API 호출
+      const params = new URLSearchParams({
+        ServiceKey: HOSPITAL_API_CONFIG.SERVICE_KEY,
+        Q0: region,
+        QD: departmentCode,
+        numOfRows: HOSPITAL_API_CONFIG.DEFAULT_NUM_OF_ROWS,
+        pageNo: 1,
+        _type: 'json'
+      });
+      url = `${HOSPITAL_API_CONFIG.BASE_URL}?${params.toString()}`;
+      console.log('Direct API 요청 URL:', url);
+    }
 
     const response = await fetch(url, {
       method: 'GET',
