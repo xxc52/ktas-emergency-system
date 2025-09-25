@@ -7,6 +7,7 @@
 응급 구조 대원을 위한 KTAS 평가 시스템으로, 환자의 상태를 단계별로 평가하여 적절한 응급실을 안내하는 웹 애플리케이션입니다.
 
 ### 주요 기능
+
 - **KTAS 평가**: 2,597개의 의료 데이터를 기반으로 5단계 중증도 분류
 - **병원 추천**: KTAS 5급 환자에게 LLM 기반 적절한 병원 추천
 - **실시간 지도**: Leaflet 지도에 병원 위치 표시
@@ -54,7 +55,7 @@ ngrok이 제공하는 공개 URL (예: https://abc123.ngrok-free.app)을 복사�
 
 ```javascript
 // ngrok URL로 변경 (마지막 슬래시 제거 필수)
-const PRIMARY_URL = 'https://abc123.ngrok-free.app';  // 실제 ngrok URL로 변경
+const PRIMARY_URL = "https://abc123.ngrok-free.app"; // 실제 ngrok URL로 변경
 ```
 
 ### 4. 배포 후 테스트

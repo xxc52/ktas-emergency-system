@@ -5,10 +5,10 @@
 
 // LLM API 기본 설정
 const LLM_CONFIG = {
-  BASE_URL: 'http://localhost:8000', // 로컬 LLM 서버
+  BASE_URL: "https://5d9edeeafa5f.ngrok-free.app", // 로컬 LLM 서버
   ENDPOINTS: {
-    HEALTH: '/health',
-    DEPARTMENT: '/department'
+    HEALTH: "/health",
+    DEPARTMENT: "/department",
   },
   TIMEOUT: 10000, // 10초 타임아웃
 };
@@ -19,17 +19,20 @@ const LLM_CONFIG = {
  */
 export async function checkLLMHealth() {
   try {
-    const response = await fetch(`${LLM_CONFIG.BASE_URL}${LLM_CONFIG.ENDPOINTS.HEALTH}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      signal: AbortSignal.timeout(LLM_CONFIG.TIMEOUT),
-    });
+    const response = await fetch(
+      `${LLM_CONFIG.BASE_URL}${LLM_CONFIG.ENDPOINTS.HEALTH}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        signal: AbortSignal.timeout(LLM_CONFIG.TIMEOUT),
+      }
+    );
 
     return response.ok;
   } catch (error) {
-    console.warn('LLM 서버 연결 실패:', error.message);
+    console.warn("LLM 서버 연결 실패:", error.message);
     return false;
   }
 }
@@ -46,24 +49,27 @@ export async function checkLLMHealth() {
  */
 export async function determineDepartmentCode(patientData) {
   try {
-    console.log('LLM 진료과목 판단 요청:', patientData);
+    console.log("LLM 진료과목 판단 요청:", patientData);
 
     const requestData = {
       ktas_level: patientData.ktasLevel || 5,
-      primary_disease: patientData.primaryDisease || '',
+      primary_disease: patientData.primaryDisease || "",
       first_considerations: patientData.firstConsiderations || [],
       second_considerations: patientData.secondConsiderations || [],
-      location: patientData.location || ''
+      location: patientData.location || "",
     };
 
-    const response = await fetch(`${LLM_CONFIG.BASE_URL}${LLM_CONFIG.ENDPOINTS.DEPARTMENT}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestData),
-      signal: AbortSignal.timeout(LLM_CONFIG.TIMEOUT),
-    });
+    const response = await fetch(
+      `${LLM_CONFIG.BASE_URL}${LLM_CONFIG.ENDPOINTS.DEPARTMENT}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+        signal: AbortSignal.timeout(LLM_CONFIG.TIMEOUT),
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -71,7 +77,7 @@ export async function determineDepartmentCode(patientData) {
     }
 
     const result = await response.json();
-    console.log('LLM 진료과목 판단 결과:', result);
+    console.log("LLM 진료과목 판단 결과:", result);
 
     return {
       success: true,
@@ -79,25 +85,23 @@ export async function determineDepartmentCode(patientData) {
       departmentName: result.department_name,
       confidence: result.confidence,
       reasoning: result.reasoning,
-      performance: result.performance
+      performance: result.performance,
     };
-
   } catch (error) {
-    console.error('LLM 진료과목 판단 실패:', error);
+    console.error("LLM 진료과목 판단 실패:", error);
 
     // 폴백: LLM 실패 시 응급의학과로 기본 설정
     return {
       success: false,
-      departmentCode: 'D024',
-      departmentName: '응급의학과',
+      departmentCode: "D024",
+      departmentName: "응급의학과",
       confidence: 0.0,
-      reasoning: 'LLM 서버 연결 실패로 응급의학과 기본 설정',
+      reasoning: "LLM 서버 연결 실패로 응급의학과 기본 설정",
       error: error.message,
-      fallback: true
+      fallback: true,
     };
   }
 }
-
 
 /**
  * 현재 위치를 기반으로 시도 정보 반환
@@ -106,7 +110,7 @@ export async function determineDepartmentCode(patientData) {
  */
 export async function getRegionsForSearch(location) {
   // 기본 검색 지역 (서울 + 경기)
-  const defaultRegions = ['서울특별시', '경기도'];
+  const defaultRegions = ["서울특별시", "경기도"];
 
   if (!location || !location.lat || !location.lng) {
     return defaultRegions;
@@ -118,24 +122,23 @@ export async function getRegionsForSearch(location) {
 
     // 서울 근처 (대략적인 범위)
     if (lat >= 37.4 && lat <= 37.7 && lng >= 126.8 && lng <= 127.2) {
-      return ['서울특별시', '경기도'];
+      return ["서울특별시", "경기도"];
     }
 
     // 경기도 범위
     if (lat >= 37.0 && lat <= 38.0 && lng >= 126.5 && lng <= 127.8) {
-      return ['경기도', '서울특별시'];
+      return ["경기도", "서울특별시"];
     }
 
     // 인천 범위
     if (lat >= 37.3 && lat <= 37.6 && lng >= 126.4 && lng <= 126.8) {
-      return ['인천광역시', '경기도'];
+      return ["인천광역시", "경기도"];
     }
 
     // 기타 지역은 기본값 반환
     return defaultRegions;
-
   } catch (error) {
-    console.warn('지역 판단 실패, 기본값 사용:', error);
+    console.warn("지역 판단 실패, 기본값 사용:", error);
     return defaultRegions;
   }
 }
@@ -150,11 +153,14 @@ export async function getRegionsForSearch(location) {
  */
 export function calculateDistance(lat1, lng1, lat2, lng2) {
   const R = 6371; // 지구 반지름 (km)
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
@@ -163,7 +169,7 @@ const llmService = {
   checkLLMHealth,
   determineDepartmentCode,
   getRegionsForSearch,
-  calculateDistance
+  calculateDistance,
 };
 
 export default llmService;
