@@ -5,12 +5,12 @@
 
 // LLM API 기본 설정
 const LLM_CONFIG = {
-  BASE_URL: "https://5d9edeeafa5f.ngrok-free.app", // 로컬 LLM 서버
+  BASE_URL: "http://localhost:8000", // 로컬 LLM 서버
   ENDPOINTS: {
     HEALTH: "/health",
     DEPARTMENT: "/department",
   },
-  TIMEOUT: 30000, // 30초 타임아웃 (Vercel 환경 고려)
+  TIMEOUT: 10000, // 10초 타임아웃
 };
 
 /**
@@ -25,9 +25,8 @@ export async function checkLLMHealth() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "true", // ngrok 브라우저 경고 우회
         },
-        signal: AbortSignal.timeout(5000), // Health check는 5초
+        signal: AbortSignal.timeout(LLM_CONFIG.TIMEOUT),
       }
     );
 
@@ -52,13 +51,6 @@ export async function determineDepartmentCode(patientData) {
   try {
     console.log("LLM 진료과목 판단 요청:", patientData);
 
-    // LLM 서버 상태 먼저 확인 (빠른 실패 처리)
-    const isHealthy = await checkLLMHealth();
-    if (!isHealthy) {
-      console.warn('LLM 서버 상태 확인 실패 - 폴백 사용');
-      throw new Error('LLM 서버 연결 불가');
-    }
-
     const requestData = {
       ktas_level: patientData.ktasLevel || 5,
       primary_disease: patientData.primaryDisease || "",
@@ -73,11 +65,9 @@ export async function determineDepartmentCode(patientData) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "true", // ngrok 브라우저 경고 우회
         },
         body: JSON.stringify(requestData),
         signal: AbortSignal.timeout(LLM_CONFIG.TIMEOUT),
-        mode: 'cors', // CORS 명시적 설정
       }
     );
 
@@ -93,22 +83,18 @@ export async function determineDepartmentCode(patientData) {
       success: true,
       departmentCode: result.department_code,
       departmentName: result.department_name,
-      confidence: result.confidence,
       reasoning: result.reasoning,
       performance: result.performance,
     };
   } catch (error) {
     console.error("LLM 진료과목 판단 실패:", error);
 
-    // 폴백: 병명 기반 간단한 매핑
-    const fallbackCode = getFallbackDepartmentCode(patientData.primaryDisease);
-
+    // 폴백: LLM 실패 시 응급의학과로 기본 설정
     return {
       success: false,
-      departmentCode: fallbackCode.code,
-      departmentName: fallbackCode.name,
-      confidence: 0.3,
-      reasoning: `LLM 서버 연결 실패. ${fallbackCode.reason}`,
+      departmentCode: "D024",
+      departmentName: "응급의학과",
+      reasoning: "LLM 서버 연결 실패로 응급의학과 기본 설정",
       error: error.message,
       fallback: true,
     };
@@ -175,36 +161,6 @@ export function calculateDistance(lat1, lng1, lat2, lng2) {
       Math.sin(dLng / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
-}
-
-/**
- * LLM 실패 시 폴백 진료과목 코드 결정
- * @param {string} primaryDisease - 주요 병명
- * @returns {Object} 폴백 진료과목 정보
- */
-function getFallbackDepartmentCode(primaryDisease) {
-  const diseaseText = (primaryDisease || '').toLowerCase();
-
-  // 기본 키워드 매핑
-  const mappings = [
-    { keywords: ['귀', '이비인후', '코', '목'], code: 'D013', name: '이비인후과', reason: '귀/코/목 관련 증상' },
-    { keywords: ['눈', '안과', '시력'], code: 'D012', name: '안과', reason: '눈 관련 증상' },
-    { keywords: ['피부', '발진', '두드러기'], code: 'D008', name: '피부과', reason: '피부 관련 증상' },
-    { keywords: ['치아', '이', '입', '구강'], code: 'D026', name: '구강외과', reason: '구강 관련 증상' },
-    { keywords: ['소화', '복통', '위', '장'], code: 'D001', name: '내과', reason: '소화계 증상' },
-    { keywords: ['골절', '탈구', '외상', '다치'], code: 'D005', name: '정형외과', reason: '외상 및 근골격계 증상' },
-    { keywords: ['심장', '호흡', '가슴'], code: 'D001', name: '내과', reason: '심혈관 및 호흡계 증상' },
-    { keywords: ['두통', '두부', '머리'], code: 'D011', name: '신경과', reason: '신경계 증상' },
-  ];
-
-  for (const mapping of mappings) {
-    if (mapping.keywords.some(keyword => diseaseText.includes(keyword))) {
-      return mapping;
-    }
-  }
-
-  // 기본값: 응급의학과
-  return { code: 'D024', name: '응급의학과', reason: '일반적인 응급 상황' };
 }
 
 const llmService = {

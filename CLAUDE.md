@@ -156,7 +156,7 @@ Uses React's built-in state management with performance optimizations:
    - Database security properly configured
    - Consistent navigation across all pages
 
-### ✅ Completed (Current Session):
+### ✅ Completed (Previous Session):
 
 1. **KTAS 5급 환자 병원 검색 시스템 완료**
 
@@ -172,25 +172,36 @@ Uses React's built-in state management with performance optimizations:
    - **거리순 정렬**: Haversine 공식으로 현재위치 기준 거리계산 후 상위 20개 병원 표시
    - **지도 연동**: Leaflet 지도에 병원 마커 및 상세 정보 팝업
 
-3. **LLM 시스템 개선:**
-   - 해부학적 위치 기반 판단 로직 (귀→이비인후과, 눈→안과 등)
-   - 의료 전문성 고려한 프롬프트 엔지니어링
-   - 구조화된 환자 데이터 처리 (`ask_unified_json` 메서드 개선)
-   - 강화된 진료과목 코드 파싱 (정규표현식 기반)
+### ✅ Completed (Current Session):
 
-4. **Files Modified/Created:**
-   - `src/utils/llmService.js` - LLM API 통신 및 진료과목 판단
-   - `src/utils/hospitalApi.js` - 병원 API 통합 및 거리 계산
-   - `src/app/result/components/HospitalListLevel5.js` - KTAS 5급 환자용 병원 목록
-   - `src/app/result/components/KakaoMap.js` - 병원 지도 마커 및 팝업
-   - `E:\0KoreaUniversity\DAB\llm\medical_rag_chromadb_final.py` - LLM 환자 데이터 처리 개선
-   - `E:\0KoreaUniversity\DAB\llm\medical_rag_api.py` - FastAPI 진료과목 판단 엔드포인트
+1. **LLM 진료과목 판단 시스템 성능 개선**
 
-5. **검증된 기능:**
-   - **LLM 판단 정확성**: "귀의 이물질" → D013 (이비인후과) ✅
-   - **병원 검색**: 서울/경기 지역 실시간 병원 데이터 ✅
-   - **거리 계산**: GPS 기반 정확한 거리 측정 ✅
-   - **UI 표시**: 병원 정보, 진료과목 태그, 운영상태 ✅
+   - **RAG 제거**: KTAS 5급 환자는 RAG 없이 직접 LLM 추론으로 성능 대폭 향상
+   - **KTAS 레벨별 처리**: 5급(RAG 없음, 빠름) vs 1-4급(RAG 사용, 정확함)
+   - **신뢰도 필드 제거**: 불필요한 confidence 필드 완전 제거
+   - **프롬프트 최적화**: 진료과목별 담당 영역 명시로 정확도 개선
+
+2. **판단 정확도 개선:**
+
+   - **소화계**: 변비, 복통, 설사 → D001 내과
+   - **해부학적 위치**: 귀→D013, 눈→D012, 피부→D014
+   - **상세한 의학적 근거**: 해부학적 위치와 질환 특성 기반 판단 근거 제공
+
+3. **성능 최적화:**
+   - **응답 속도**: 벡터 검색 제거로 2-3초 → 0.4초 단축
+   - **에러 처리**: AIMessage 객체 처리 개선
+   - **로컬 개발**: ngrok 대신 localhost:8000 직접 연결
+
+4. **Files Modified:**
+   - `E:\0KoreaUniversity\DAB\llm\medical_rag_api.py` - /department 엔드포인트 개선
+   - `src/utils/llmService.js` - confidence 제거, 로컬 연결 설정
+   - `src/app/result/components/HospitalListLevel5.js` - 신뢰도 표시 제거
+
+5. **검증된 개선사항:**
+   - **변비 → D001 내과** (이전: D013 이비인후과 오판) ✅
+   - **응답 속도**: 0.38초 (이전: 2-3초) ✅
+   - **판단 근거**: "변비는 소화계 질환으로 장의 운동 장애..." 상세 설명 ✅
+   - **에러 없는 처리**: AIMessage 객체 안정적 처리 ✅
 
 ### 🎯 Future Implementation Ideas:
 

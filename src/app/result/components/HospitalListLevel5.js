@@ -150,7 +150,7 @@ export default function HospitalListLevel5({ currentLocation, patientData, onHos
             <strong>판단된 진료과목:</strong> {llmStatus.departmentName} ({llmStatus.departmentCode})
           </div>
           <div style={{ marginTop: '4px', color: '#6b7280' }}>
-            신뢰도: {Math.round(llmStatus.confidence * 100)}% | {llmStatus.reasoning}
+            {llmStatus.reasoning}
           </div>
           {llmStatus.fallback && (
             <div style={{ marginTop: '4px', color: '#dc2626' }}>
