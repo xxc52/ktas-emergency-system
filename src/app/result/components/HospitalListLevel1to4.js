@@ -92,13 +92,12 @@ export default function HospitalListLevel1to4({
     O034: "ECMO",
   };
 
-  // API 응답의 code로 병원 필터링
-  const filterHospitalsByApiCode = (hospitals, patientFilters) => {
-    const filtered = [];
-
-    for (const hospital of hospitals) {
-      let isBlocked = false;
-      let blockReasons = [];
+  // API 응답의 code로 병원에 메시지 페널티 추가 (중복 감점 방지)
+  const addMessagePenaltiesToHospitals = (hospitals, patientFilters) => {
+    return hospitals.map(hospital => {
+      let messagePenalty = 0;
+      let penaltyReasons = [];
+      const processedCodes = new Set(); // 중복 방지용
 
       // 병원의 erMessages와 unavailableMessages 확인
       const allMessages = [
@@ -108,49 +107,74 @@ export default function HospitalListLevel1to4({
 
       for (const msg of allMessages) {
         const code = msg.code;
-        if (!code) continue;
+        if (!code || processedCodes.has(code)) continue;
 
-        // 환자 필터와 API code 매칭
+        // 기존 요소에서 이미 감점된 코드인지 확인
+        let alreadyPenalized = false;
+
+        // 입원병상 중복 체크
         if (patientFilters.rltmCd && patientFilters.rltmCd.includes(code)) {
-          isBlocked = true;
-          blockReasons.push(
-            `입원병상 불가 (${code}): ${msg.message.substring(0, 30)}...`
-          );
+          const existingElement = hospital.rltmCd?.elements?.[code];
+          if (existingElement && ['N', 'N1', 'NONE'].includes(existingElement.availableLevel)) {
+            alreadyPenalized = true;
+            console.log(`  ℹ️ ${hospital.name}: ${code} 이미 입원병상에서 감점됨, 메시지 페널티 제외`);
+          } else {
+            messagePenalty += 50;
+            penaltyReasons.push(`입원병상 메시지 (${filterCodeNames[code] || code})`);
+            processedCodes.add(code);
+          }
         }
 
-        if (patientFilters.svdssCd && patientFilters.svdssCd.includes(code)) {
-          isBlocked = true;
-          blockReasons.push(
-            `중증응급 불가 (${code}): ${msg.message.substring(0, 30)}...`
-          );
+        // 중증응급 중복 체크
+        if (!alreadyPenalized && patientFilters.svdssCd && patientFilters.svdssCd.includes(code)) {
+          const existingElement = hospital.svdssCd?.elements?.[code];
+          if (existingElement && ['N', 'N1', 'NONE'].includes(existingElement.availableLevel)) {
+            alreadyPenalized = true;
+            console.log(`  ℹ️ ${hospital.name}: ${code} 이미 중증응급에서 감점됨, 메시지 페널티 제외`);
+          } else {
+            messagePenalty += 40;
+            penaltyReasons.push(`중증응급 메시지 (${filterCodeNames[code] || code})`);
+            processedCodes.add(code);
+          }
         }
 
-        if (
-          patientFilters.rltmEmerCd &&
-          patientFilters.rltmEmerCd.includes(code)
-        ) {
-          isBlocked = true;
-          blockReasons.push(
-            `응급실 불가 (${code}): ${msg.message.substring(0, 30)}...`
-          );
+        // 응급실병상 중복 체크
+        if (!alreadyPenalized && patientFilters.rltmEmerCd && patientFilters.rltmEmerCd.includes(code)) {
+          const existingElement = hospital.rltmEmerCd?.elements?.[code];
+          if (existingElement && ['N', 'N1', 'NONE'].includes(existingElement.availableLevel)) {
+            alreadyPenalized = true;
+            console.log(`  ℹ️ ${hospital.name}: ${code} 이미 응급실병상에서 감점됨, 메시지 페널티 제외`);
+          } else {
+            messagePenalty += 80;
+            penaltyReasons.push(`응급실 메시지 (${filterCodeNames[code] || code})`);
+            processedCodes.add(code);
+          }
         }
 
-        if (patientFilters.rltmMeCd && patientFilters.rltmMeCd.includes(code)) {
-          isBlocked = true;
-          blockReasons.push(
-            `장비 불가 (${code}): ${msg.message.substring(0, 30)}...`
-          );
+        // 장비 중복 체크
+        if (!alreadyPenalized && patientFilters.rltmMeCd && patientFilters.rltmMeCd.includes(code)) {
+          const existingElement = hospital.rltmMeCd?.elements?.[code];
+          if (existingElement && ['N', 'N1', 'NONE'].includes(existingElement.availableLevel)) {
+            alreadyPenalized = true;
+            console.log(`  ℹ️ ${hospital.name}: ${code} 이미 장비에서 감점됨, 메시지 페널티 제외`);
+          } else {
+            messagePenalty += 30;
+            penaltyReasons.push(`장비 메시지 (${filterCodeNames[code] || code})`);
+            processedCodes.add(code);
+          }
         }
       }
 
-      if (isBlocked) {
-        console.log(`  ❌ ${hospital.name} 제외: ${blockReasons.join(", ")}`);
-      } else {
-        filtered.push(hospital);
+      if (messagePenalty > 0) {
+        console.log(`  ⚠️ ${hospital.name} 메시지 감점: -${messagePenalty}점 (${penaltyReasons.join(", ")})`);
       }
-    }
 
-    return filtered;
+      return {
+        ...hospital,
+        messagePenalty,
+        penaltyReasons
+      };
+    });
   };
 
   const searchEmergencyHospitals = async () => {
@@ -217,32 +241,32 @@ export default function HospitalListLevel1to4({
         return;
       }
 
-      // 3단계: API 응답의 code로 병원 메시지 필터링
-      addProgress("💬 병원 메시지 분석중 (API code 활용)...", "info");
+      // 3단계: API 응답의 code로 병원 메시지 페널티 추가
+      addProgress("💬 병원 메시지 분석중 (감점 방식)...", "info");
 
-      const messageFiltered = filterHospitalsByApiCode(
+      const hospitalsWithPenalties = addMessagePenaltiesToHospitals(
         rawHospitals,
         filterResult.filters
       );
 
-      if (messageFiltered.length < rawHospitals.length) {
-        const blockedCount = rawHospitals.length - messageFiltered.length;
+      const penalizedCount = hospitalsWithPenalties.filter(h => h.messagePenalty > 0).length;
+      if (penalizedCount > 0) {
         addProgress(
-          `⚠️ ${blockedCount}개 병원 제외됨 (응급실 메시지 코드 확인)`,
+          `⚠️ ${penalizedCount}개 병원에 메시지 페널티 적용`,
           "warning"
         );
       } else {
         addProgress(
-          `✅ 메시지 분석 완료 (${messageFiltered.length}개 병원 사용 가능)`,
+          `✅ 메시지 분석 완료 (페널티 없음)`,
           "success"
         );
       }
 
-      // 4단계: 병원 점수 계산 및 정렬
+      // 4단계: 병원 점수 계산 및 정렬 (메시지 페널티 포함)
       addProgress("🏆 병원 우선순위 계산중...", "info");
 
       const scoredHospitals = filterAndScoreHospitals(
-        messageFiltered,
+        hospitalsWithPenalties,
         currentLocation,
         patientData
       );
@@ -657,58 +681,72 @@ export default function HospitalListLevel1to4({
             </div>
 
             <div className="hospital-details">
-              {/* 병상 정보 - 숫자만 표시 */}
-              {hospital.emergencyBeds && (
+              {/* 2x2 그리드 레이아웃 */}
+              <div className="hospital-grid">
+                {/* 첫 번째 행 */}
                 <div className="hospital-row">
                   <span className="detail-label">응급실 병상:</span>
                   <span className="detail-value" style={{ fontWeight: "600" }}>
-                    {hospital.emergencyBeds.usable}/{hospital.emergencyBeds.total}
+                    {hospital.emergencyBeds ?
+                      `${hospital.emergencyBeds.usable}/${hospital.emergencyBeds.total}` :
+                      '-'}
                   </span>
                 </div>
-              )}
 
-              {/* 입원병상 정보 */}
-              {hospital.admissionBeds && Object.keys(hospital.admissionBeds).length > 0 && (
                 <div className="hospital-row">
                   <span className="detail-label">입원병상:</span>
-                  <span className="detail-value" style={{ fontSize: "12px" }}>
-                    {Object.entries(hospital.admissionBeds).map(([code, data]) =>
-                      `${data.usable}/${data.total}`
-                    ).join(", ")}
+                  <span className="detail-value" style={{ fontSize: "11px" }}>
+                    {hospital.admissionBeds && Object.keys(hospital.admissionBeds).length > 0 ? (
+                      Object.entries(hospital.admissionBeds).map(([code, data]) => {
+                        if (!data || typeof data !== 'object') return null;
+                        const usable = data.usable !== undefined ? data.usable : '-';
+                        const total = data.total !== undefined ? data.total : '-';
+                        return `${filterCodeNames[code] || code}: ${usable}/${total}`;
+                      }).filter(Boolean).join(", ")
+                    ) : '-'}
                   </span>
                 </div>
-              )}
 
-              {/* 중증응급질환 */}
-              {hospital.criticalDiseases && Object.keys(hospital.criticalDiseases).length > 0 && (
+                {/* 두 번째 행 */}
                 <div className="hospital-row">
                   <span className="detail-label">중증응급:</span>
-                  <span className="detail-value" style={{ fontSize: "12px" }}>
-                    {Object.entries(hospital.criticalDiseases).map(([code, data]) =>
-                      data.availableLevel === "Y" ? "가능" : data.availableLevel === "N" ? "불가" : data.availableLevel
-                    ).join(", ")}
+                  <span className="detail-value" style={{ fontSize: "11px" }}>
+                    {hospital.criticalDiseases && Object.keys(hospital.criticalDiseases).length > 0 ? (
+                      Object.entries(hospital.criticalDiseases).map(([code, data]) => {
+                        if (!data || typeof data !== 'object') return null;
+                        const level = data.availableLevel;
+                        let status = '-';
+                        if (level === 'Y') status = '가능';
+                        else if (level === 'N') status = '불가';
+                        else if (level === 'N1') status = '제한';
+                        else if (level === 'NONE') status = '없음';
+                        return `${filterCodeNames[code] || code}: ${status}`;
+                      }).filter(Boolean).join(", ")
+                    ) : '-'}
                   </span>
                 </div>
-              )}
 
-              {/* 장비정보 */}
-              {hospital.equipment && Object.keys(hospital.equipment).length > 0 && (
                 <div className="hospital-row">
                   <span className="detail-label">장비:</span>
-                  <span className="detail-value" style={{ fontSize: "12px" }}>
-                    {Object.entries(hospital.equipment).map(([code, data]) =>
-                      data.availableLevel === "Y" ? "사용가능" : data.availableLevel === "N" ? "사용불가" : data.availableLevel
-                    ).join(", ")}
+                  <span className="detail-value" style={{ fontSize: "11px" }}>
+                    {hospital.equipment && Object.keys(hospital.equipment).length > 0 ? (
+                      Object.entries(hospital.equipment).map(([code, data]) => {
+                        if (!data || typeof data !== 'object') return null;
+                        const level = data.availableLevel;
+                        let status = '-';
+                        if (level === 'Y') status = '가능';
+                        else if (level === 'N') status = '불가';
+                        else if (level === 'N1') status = '제한';
+                      else if (level === 'NONE') status = '없음';
+                      return `${filterCodeNames[code] || code}: ${status}`;
+                    }).filter(Boolean).join(", ")
+                  ) : '-'}
                   </span>
                 </div>
-              )}
-
-              <div className="hospital-row">
-                <span className="detail-label">병원 분류:</span>
-                <span className="detail-value">{hospital.divisionName}</span>
               </div>
 
-              <div className="hospital-row">
+              {/* 연락처와 주소 정보 */}
+              <div className="hospital-row" style={{ marginTop: "8px" }}>
                 <span className="detail-label">연락처:</span>
                 <span className="detail-value">
                   {hospital.phone || "정보 없음"}
@@ -720,9 +758,9 @@ export default function HospitalListLevel1to4({
                 <span className="detail-value">{hospital.address}</span>
               </div>
 
-              {/* 점수 정보 (모든 병원 표시, 최대 2줄) */}
+              {/* 점수 정보 - 토글 가능한 상세 정보 */}
               {hospital.scoreReasons && hospital.scoreReasons.length > 0 && (
-                <div
+                <details
                   style={{
                     marginTop: "12px",
                     padding: "10px 12px",
@@ -730,22 +768,40 @@ export default function HospitalListLevel1to4({
                     border: "1px solid #e5e7eb",
                     borderRadius: "8px",
                     fontSize: "12px",
-                    lineHeight: "1.6",
                   }}
                 >
-                  <div
+                  <summary
                     style={{
                       fontWeight: "600",
                       color: "#374151",
-                      marginBottom: "4px",
+                      cursor: "pointer",
+                      listStyle: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
                     }}
                   >
-                    🏆 총점: {hospital.score}점
+                    <span>🏆 병원 점수: {hospital.score}점</span>
+                    <span style={{ fontSize: "10px", color: "#9ca3af" }}>
+                      클릭하여 상세 보기 ▼
+                    </span>
+                  </summary>
+                  <div
+                    style={{
+                      marginTop: "8px",
+                      paddingTop: "8px",
+                      borderTop: "1px solid #e5e7eb",
+                      color: "#6b7280",
+                      lineHeight: "1.8",
+                    }}
+                  >
+                    {hospital.scoreReasons.map((reason, idx) => (
+                      <div key={idx} style={{ marginBottom: "2px" }}>
+                        • {reason}
+                      </div>
+                    ))}
                   </div>
-                  <div style={{ color: "#6b7280" }}>
-                    {hospital.scoreReasons.join(" · ")}
-                  </div>
-                </div>
+                </details>
               )}
 
             </div>

@@ -39,7 +39,7 @@ export async function searchEmergencyHospitals(params) {
       radius: radius,
     });
 
-    // 필터 추가
+    // 필터 추가 (LLM이 판단한 코드만)
     if (rltmEmerCd && rltmEmerCd.length > 0) {
       searchParams.append("rltmEmerCd", rltmEmerCd.join(","));
     }
@@ -100,6 +100,63 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
+// 필터 코드 이름 매핑
+const filterCodeNames = {
+  // 응급실병상
+  O001: "일반응급실",
+  O002: "소아응급실",
+  O003: "음압격리",
+  O004: "일반격리",
+  O060: "외상소생실",
+  // 입원병상
+  O006: "내과중환자실",
+  O007: "외과중환자실",
+  O008: "신생아중환자실",
+  O009: "소아중환자실",
+  O011: "신경과중환자실",
+  O012: "신경외과중환자실",
+  O013: "화상중환자실",
+  O014: "외상중환자실",
+  O015: "심장내과중환자실",
+  O016: "흉부외과중환자실",
+  O017: "일반중환자실",
+  O020: "소아응급입원",
+  O021: "외상입원",
+  O022: "수술실",
+  O023: "외상수술",
+  O026: "분만실",
+  O036: "화상전용처치실",
+  // 중증응급질환
+  Y0010: "심근경색",
+  Y0020: "뇌경색",
+  Y0031: "거미막하출혈",
+  Y0032: "뇌출혈",
+  Y0041: "흉부대동맥응급",
+  Y0042: "복부대동맥응급",
+  Y0051: "담낭질환",
+  Y0052: "담도질환",
+  Y0060: "복부응급수술",
+  Y0070: "장중첩",
+  Y0100: "저체중출생아",
+  Y0111: "분만",
+  Y0112: "산과수술",
+  Y0113: "부인과수술",
+  Y0120: "화상",
+  Y0131: "수족지접합",
+  Y0132: "사지접합외",
+  Y0150: "정신응급",
+  Y0160: "안과응급",
+  // 장비정보
+  O027: "CT",
+  O028: "MRI",
+  O029: "혈관촬영기",
+  O030: "인공호흡기(일반)",
+  O031: "인공호흡기(조산아)",
+  O032: "인큐베이터",
+  O033: "CRRT",
+  O034: "ECMO",
+};
+
 /**
  * 병원 필터링 및 점수 계산 (개선된 스코어링 시스템)
  * @param {Array} hospitals - 병원 목록
@@ -134,81 +191,152 @@ export function filterAndScoreHospitals(
       reasons.push(`센터 (+5)`);
     }
 
-    // 3. 응급실 병상 가용성 (사용가능 개수만큼 가산, 0개 이하면 -100점)
+    // 3. 응급실 병상 가용성
     const emergencyBeds = hospital.rltmEmerCd?.elements?.O001;
     if (emergencyBeds) {
       const usable = emergencyBeds.usable || 0;
+      const total = emergencyBeds.total || 0;
       if (usable <= 0) {
-        // 0 또는 음수일 때 감점
         score -= 100;
-        reasons.push(`응급병상 없음 (-100)`);
+        reasons.push(`응급병상: 0/${total} (-100)`);
+      } else if (usable <= 2) {
+        score += usable * 5;
+        reasons.push(`응급병상: ${usable}/${total} (+${usable * 5})`);
       } else {
-        score += usable;
-        reasons.push(`응급병상 ${usable}개 (+${usable})`);
+        score += usable * 3;
+        reasons.push(`응급병상: ${usable}/${total} (+${usable * 3})`);
       }
+    } else {
+      // 응급실 병상 정보가 없으면 중간 정도 감점
+      score -= 30;
+      reasons.push(`응급병상: 정보없음 (-30)`);
     }
 
-    // 4. 중증응급질환 가용성 (Y/N/N1/NONE 차등)
+    // 4. 중증응급질환 가용성
     const svdssCd = hospital.svdssCd?.elements || {};
-    let svdssBonus = 0;
-    let svdssPenalty = 0;
-    let svdssYCount = 0;
-    let svdssNCount = 0;
+    let svdssDetails = [];
+    let svdssScore = 0;
 
     Object.entries(svdssCd).forEach(([code, element]) => {
       const level = element.availableLevel;
+      const name = filterCodeNames[code] || code;
 
       if (level === "Y") {
-        svdssBonus += 10;
-        svdssYCount++;
-      } else if (level === "N" || level === "N1") {
-        svdssPenalty += 50;
-        svdssNCount++;
+        svdssScore += 10;
+        svdssDetails.push(`${name}:Y`);
+      } else if (level === "N") {
+        svdssScore -= 30;
+        svdssDetails.push(`${name}:N`);
+      } else if (level === "N1") {
+        svdssScore -= 20;
+        svdssDetails.push(`${name}:N1`);
       } else if (level === "NONE") {
-        svdssPenalty += 20;
-        svdssNCount++;
+        svdssScore -= 10;
+        svdssDetails.push(`${name}:없음`);
       }
     });
 
-    score += svdssBonus;
-    score -= svdssPenalty;
+    score += svdssScore;
 
-    if (svdssYCount > 0) {
-      reasons.push(`중증질환 가능 ${svdssYCount}개 (+${svdssBonus})`);
-    }
-    if (svdssNCount > 0 || svdssPenalty > 0) {
-      reasons.push(`중증질환 제한/불가 (-${svdssPenalty})`);
+    if (svdssDetails.length > 0) {
+      const sign = svdssScore >= 0 ? "+" : "";
+      reasons.push(
+        `중증: ${svdssDetails.slice(0, 2).join(", ")}${
+          svdssDetails.length > 2 ? " 외" : ""
+        } (${sign}${svdssScore})`
+      );
+    } else {
+      // 중증응급질환 정보가 없으면 소폭 감점
+      score -= 10;
+      reasons.push(`중증: 정보없음 (-10)`);
     }
 
-    // 5. 입원병상/장비 가용성 (Y/N/N1/NONE 차등)
+    // 5. 입원병상 가용성
     const rltmCd = hospital.rltmCd?.elements || {};
-    const rltmMeCd = hospital.rltmMeCd?.elements || {};
+    let admissionDetails = [];
+    let admissionScore = 0;
 
-    let facilityBonus = 0;
-    let facilityPenalty = 0;
+    Object.entries(rltmCd).forEach(([code, element]) => {
+      const level = element?.availableLevel;
+      const name = filterCodeNames[code] || code;
 
-    [...Object.values(rltmCd), ...Object.values(rltmMeCd)].forEach(
-      (element) => {
-        const level = element?.availableLevel;
-
-        if (level === "Y") {
-          facilityBonus += 5;
-        } else if (level === "N" || level === "N1") {
-          facilityPenalty += 35;
-        } else if (level === "NONE") {
-          facilityPenalty += 15;
-        }
+      if (level === "Y") {
+        admissionScore += 5;
+        admissionDetails.push(`${name}:Y`);
+      } else if (level === "N") {
+        admissionScore -= 25;
+        admissionDetails.push(`${name}:N`);
+      } else if (level === "N1") {
+        admissionScore -= 15;
+        admissionDetails.push(`${name}:N1`);
+      } else if (level === "NONE") {
+        admissionScore -= 10;
+        admissionDetails.push(`${name}:없음`);
       }
-    );
+    });
 
-    score += facilityBonus;
-    score -= facilityPenalty;
+    score += admissionScore;
 
-    if (facilityBonus > 0) {
-      reasons.push(`입원/장비 가능 (+${facilityBonus})`);
+    if (admissionDetails.length > 0) {
+      const sign = admissionScore >= 0 ? "+" : "";
+      reasons.push(
+        `입원: ${admissionDetails.slice(0, 2).join(", ")}${
+          admissionDetails.length > 2 ? " 외" : ""
+        } (${sign}${admissionScore})`
+      );
+    } else {
+      // 입원병상 정보가 없으면 소폭 감점
+      score -= 5;
+      reasons.push(`입원: 정보없음 (-5)`);
     }
-    if (facilityPenalty > 0) {
-      reasons.push(`입원/장비 제한 (-${facilityPenalty})`);
+
+    // 6. 장비 가용성
+    const rltmMeCd = hospital.rltmMeCd?.elements || {};
+    let equipmentDetails = [];
+    let equipmentScore = 0;
+
+    Object.entries(rltmMeCd).forEach(([code, element]) => {
+      const level = element?.availableLevel;
+      const name = filterCodeNames[code] || code;
+
+      if (level === "Y") {
+        equipmentScore += 5;
+        equipmentDetails.push(`${name}:Y`);
+      } else if (level === "N") {
+        equipmentScore -= 20;
+        equipmentDetails.push(`${name}:N`);
+      } else if (level === "N1") {
+        equipmentScore -= 10;
+        equipmentDetails.push(`${name}:N1`);
+      } else if (level === "NONE") {
+        equipmentScore -= 5;
+        equipmentDetails.push(`${name}:없음`);
+      }
+    });
+
+    score += equipmentScore;
+
+    if (equipmentDetails.length > 0) {
+      const sign = equipmentScore >= 0 ? "+" : "";
+      reasons.push(
+        `장비: ${equipmentDetails.slice(0, 2).join(", ")}${
+          equipmentDetails.length > 2 ? " 외" : ""
+        } (${sign}${equipmentScore})`
+      );
+    } else {
+      // 장비 정보가 없으면 소폭 감점
+      score -= 5;
+      reasons.push(`장비: 정보없음 (-5)`);
+    }
+
+    // 7. 병원 메시지 페널티 (이미 계산된 값 사용)
+    if (hospital.messagePenalty && hospital.messagePenalty > 0) {
+      score -= hospital.messagePenalty;
+      reasons.push(
+        `메시지 페널티: ${hospital.penaltyReasons.join(", ")} (-${
+          hospital.messagePenalty
+        })`
+      );
     }
 
     return {
