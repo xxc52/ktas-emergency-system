@@ -48,7 +48,13 @@
       "Bash(dir:*)",
       "Bash(timeout:*)",
       "Bash(PYTHONIOENCODING=utf-8 python debug_test.py)",
-      "Bash(PYTHONIOENCODING=utf-8 python debug_search.py)"
+      "Bash(PYTHONIOENCODING=utf-8 python debug_search.py)",
+      "Bash(PYTHONIOENCODING=utf-8 python test_api_8001.py)",
+      "Bash(ollama list:*)",
+      "Bash(ollama serve:*)",
+      "Bash(cat:*)",
+      "Bash(lsof:*)",
+      "Bash(md5sum:*)"
     ],
     "deny": []
   }

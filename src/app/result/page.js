@@ -1,37 +1,36 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import { savePatientAssessment } from '../../utils/patientRecordsSupabase';
-import Timer from './components/Timer';
-import PatientInfo from './components/PatientInfo';
-import HospitalListLevel1to4 from './components/HospitalListLevel1to4';
-import HospitalListLevel5 from './components/HospitalListLevel5';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import { savePatientAssessment } from "../../utils/patientRecordsSupabase";
+import Timer from "./components/Timer";
+import PatientInfo from "./components/PatientInfo";
+import HospitalListLevel1to4 from "./components/HospitalListLevel1to4";
+import HospitalListLevel5 from "./components/HospitalListLevel5";
 
 // Leaflet 지도 컴포넌트를 dynamic import로 로드 (SSR 비활성화)
-const LeafletMap = dynamic(
-  () => import('./components/KakaoMap'),
-  {
-    ssr: false,
-    loading: () => <div className="w-full h-full bg-gray-100 animate-pulse rounded-lg" />
-  }
-);
+const LeafletMap = dynamic(() => import("./components/KakaoMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full bg-gray-100 animate-pulse rounded-lg" />
+  ),
+});
 
 const ktasColors = {
-  1: '#FF0000', // Red - 즉시
-  2: '#FF8000', // Orange - 긴급
-  3: '#FFFF00', // Yellow - 준응급
-  4: '#00FF00', // Green - 비응급
-  5: '#0080FF'  // Blue - 진료지연가능
+  1: "#FF0000", // Red - 즉시
+  2: "#FF8000", // Orange - 긴급
+  3: "#FFFF00", // Yellow - 준응급
+  4: "#00FF00", // Green - 비응급
+  5: "#0080FF", // Blue - 진료지연가능
 };
 
 const ktasLabels = {
-  1: '즉시',
-  2: '긴급',
-  3: '준응급',
-  4: '비응급',
-  5: '진료지연가능'
+  1: "즉시",
+  2: "긴급",
+  3: "준응급",
+  4: "비응급",
+  5: "진료지연가능",
 };
 
 export default function Result() {
@@ -42,7 +41,7 @@ export default function Result() {
   const [hospitals, setHospitals] = useState([]);
 
   useEffect(() => {
-    const savedResult = localStorage.getItem('ktasResult');
+    const savedResult = localStorage.getItem("ktasResult");
     if (savedResult) {
       const resultData = JSON.parse(savedResult);
       setResult(resultData);
@@ -57,15 +56,15 @@ export default function Result() {
         (position) => {
           setCurrentLocation({
             lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lng: position.coords.longitude,
           });
         },
         (error) => {
-          console.error('위치 정보를 가져올 수 없습니다:', error);
+          console.error("위치 정보를 가져올 수 없습니다:", error);
           // 기본 위치 설정 (예: 고려대학교 서울캠퍼스)
           setCurrentLocation({
             lat: 37.5896,
-            lng: 127.0321
+            lng: 127.0321,
           });
         }
       );
@@ -73,7 +72,7 @@ export default function Result() {
       // 기본 위치 설정
       setCurrentLocation({
         lat: 37.5896,
-        lng: 127.0321
+        lng: 127.0321,
       });
     }
   }, []);
@@ -81,20 +80,20 @@ export default function Result() {
   const saveRecord = async (resultData) => {
     try {
       if (!resultData.worker || !resultData.ktasLevel) {
-        console.warn('기록 저장에 필요한 데이터가 부족합니다.');
+        console.warn("기록 저장에 필요한 데이터가 부족합니다.");
         return;
       }
 
       // 이미 저장되었는지 확인 (중복 저장 방지)
-      const alreadySaved = localStorage.getItem('recordSaved');
+      const alreadySaved = localStorage.getItem("recordSaved");
       if (alreadySaved) {
-        console.log('이미 저장된 기록입니다.');
+        console.log("이미 저장된 기록입니다.");
         setRecordSaved(true);
         return;
       }
 
-      const patientType = localStorage.getItem('selectedAge') || 'adult';
-      
+      const patientType = localStorage.getItem("selectedAge") || "adult";
+
       // assessment_data 구조화
       const assessmentData = {
         category: resultData.category,
@@ -102,18 +101,18 @@ export default function Result() {
         diseases: resultData.diseases || [],
         firstConsiderations: resultData.firstConsiderations || [],
         secondConsiderations: resultData.secondConsiderations || [],
-        evaluationTime: new Date().toISOString()
+        evaluationTime: new Date().toISOString(),
       };
 
-      const rescuerId = localStorage.getItem('selectedRescuerId');
+      const rescuerId = localStorage.getItem("selectedRescuerId");
       const finalRescuerId = rescuerId ? parseInt(rescuerId) : 1; // 기본값 1 (테스트용)
-      
-      console.log('환자 기록 저장 시도:', {
+
+      console.log("환자 기록 저장 시도:", {
         rescuerId: finalRescuerId,
         patientType,
-        ktasLevel: resultData.ktasLevel
+        ktasLevel: resultData.ktasLevel,
       });
-      
+
       const saved = await savePatientAssessment(
         finalRescuerId,
         patientType,
@@ -123,35 +122,35 @@ export default function Result() {
       );
 
       if (saved) {
-        console.log('✅ 환자 기록이 저장되었습니다.');
-        localStorage.setItem('recordSaved', 'true');
+        console.log("✅ 환자 기록이 저장되었습니다.");
+        localStorage.setItem("recordSaved", "true");
         setRecordSaved(true);
       }
     } catch (error) {
-      console.error('환자 기록 저장 오류:', {
+      console.error("환자 기록 저장 오류:", {
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
       });
     }
   };
 
   const handleEndSituation = () => {
     // 상황 종료 시 데이터 정리 및 처음으로 이동
-    localStorage.removeItem('selectedWorker');
-    localStorage.removeItem('selectedRescuerId');
-    localStorage.removeItem('selectedAge');
-    localStorage.removeItem('ktasResult');
-    localStorage.removeItem('recordSaved');
-    localStorage.removeItem('ktasTimer');
-    router.push('/profile');
+    localStorage.removeItem("selectedWorker");
+    localStorage.removeItem("selectedRescuerId");
+    localStorage.removeItem("selectedAge");
+    localStorage.removeItem("ktasResult");
+    localStorage.removeItem("recordSaved");
+    localStorage.removeItem("ktasTimer");
+    router.push("/profile");
   };
 
   const handleBack = () => {
-    const age = localStorage.getItem('selectedAge');
-    if (age === 'adult') {
-      router.push('/adult-input');
+    const age = localStorage.getItem("selectedAge");
+    if (age === "adult") {
+      router.push("/adult-input");
     } else {
-      router.push('/pediatric-input');
+      router.push("/pediatric-input");
     }
   };
 
@@ -174,10 +173,7 @@ export default function Result() {
         </div>
         <div className="header-right">
           <Timer />
-          <button
-            className="end-situation-btn"
-            onClick={handleEndSituation}
-          >
+          <button className="end-situation-btn" onClick={handleEndSituation}>
             상황 종료
           </button>
         </div>
@@ -193,7 +189,10 @@ export default function Result() {
             ktasLabels={ktasLabels}
           />
           <div className="map-container">
-            <LeafletMap currentLocation={currentLocation} hospitals={hospitals} />
+            <LeafletMap
+              currentLocation={currentLocation}
+              hospitals={hospitals}
+            />
           </div>
         </div>
 
@@ -211,6 +210,7 @@ export default function Result() {
               currentLocation={currentLocation}
               patientData={result}
               ktasLevel={ktasLevel}
+              onHospitalsUpdate={setHospitals}
             />
           )}
         </div>

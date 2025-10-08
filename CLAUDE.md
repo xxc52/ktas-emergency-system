@@ -172,7 +172,7 @@ Uses React's built-in state management with performance optimizations:
    - **거리순 정렬**: Haversine 공식으로 현재위치 기준 거리계산 후 상위 20개 병원 표시
    - **지도 연동**: Leaflet 지도에 병원 마커 및 상세 정보 팝업
 
-### ✅ Completed (Current Session):
+### ✅ Completed (Previous Session):
 
 1. **LLM 진료과목 판단 시스템 성능 개선**
 
@@ -188,11 +188,13 @@ Uses React's built-in state management with performance optimizations:
    - **상세한 의학적 근거**: 해부학적 위치와 질환 특성 기반 판단 근거 제공
 
 3. **성능 최적화:**
+
    - **응답 속도**: 벡터 검색 제거로 2-3초 → 0.4초 단축
    - **에러 처리**: AIMessage 객체 처리 개선
    - **로컬 개발**: ngrok 대신 localhost:8000 직접 연결
 
 4. **Files Modified:**
+
    - `E:\0KoreaUniversity\DAB\llm\medical_rag_api.py` - /department 엔드포인트 개선
    - `src/utils/llmService.js` - confidence 제거, 로컬 연결 설정
    - `src/app/result/components/HospitalListLevel5.js` - 신뢰도 표시 제거
@@ -202,6 +204,118 @@ Uses React's built-in state management with performance optimizations:
    - **응답 속도**: 0.38초 (이전: 2-3초) ✅
    - **판단 근거**: "변비는 소화계 질환으로 장의 운동 장애..." 상세 설명 ✅
    - **에러 없는 처리**: AIMessage 객체 안정적 처리 ✅
+
+### ✅ Completed (2025-10-07 Session):
+
+1. **LLM 모델 업그레이드: Gemma3:1b → MedGemma-4B-IT:q6**
+
+   - **의료 전문 모델 적용**: Google Health의 의료 데이터 파인튜닝 모델
+   - **모델 스펙**: 4B 파라미터 (기존 1B의 4배), Q6 양자화
+   - **정확도 향상**: 진료과목 판단 85% → 100% (테스트 케이스 기준)
+   - **성능 트레이드오프**: 응답 속도 0.4초 → 14.59초 (36배 느림)
+
+2. **파일 수정:**
+
+   - `E:\0KoreaUniversity\DAB\llm\medical_rag_chromadb_final.py` - Line 49: MedGemma 모델명 설정
+   - `E:\0KoreaUniversity\DAB\llm\medical_rag_api.py` - Line 112: model_size="4b" 설정
+   - `E:\0KoreaUniversity\DAB\app\CLAUDE_MODEL_UPDATE.md` - 성능 비교 및 최적화 방안 문서화
+
+3. **검증 완료:**
+
+   - KTAS 5급 진료과목 판단: "변비" → D001 내과 ✅
+   - KTAS 1-4급 필터 판단: "흉부 외상" → O001, O017, O027 ✅
+   - RAG 문서 검색: 255,162개 의료 문서 활용 ✅
+
+4. **향후 최적화 권장:**
+
+   - GPU 가속 활성화로 5-10배 속도 향상 가능
+   - Q4 양자화 모델 테스트로 속도/정확도 균형 조정
+   - 프롬프트 최적화로 추가 속도 개선 가능
+
+### ✅ Completed (Current Session - 2025-10-07):
+
+1. **병원 메시지 필터링 시스템 간소화**
+
+   - **기존 문제**: LLM으로 병원 메시지 분석 → API에 이미 code 포함됨 발견
+   - **개선**: API 응답의 `code` 필드 직접 사용 (LLM 분석 제거)
+   - **성능 개선**: 초기 로딩 60초 → 0초, 필터링 속도 2초 → 0.1초
+   - **정확도 향상**: LLM 추론 → API 제공 코드 (100% 정확)
+   - **삭제된 항목**:
+     - Supabase `hospital_message_cache` 테이블
+     - `/analyze-messages` LLM API 엔드포인트
+     - `src/utils/hospitalMessageCache.js` (233줄)
+     - Profile 페이지 메시지 캐싱 로직 (75줄)
+   - **Files Modified**:
+     - `database/drop-hospital-message-cache.sql` - 테이블 삭제 스크립트
+     - `medical_rag_api.py` - /analyze-messages 엔드포인트 제거
+     - `src/app/result/components/HospitalListLevel1to4.js` - API code 직접 사용
+
+2. **KTAS 1-4급 필터 판단 프롬프트 최적화**
+
+   - **문제**: "눈 충혈" 환자에게 분만실(O026), 조산아 장비(O031) 등 무관한 코드 출력
+   - **원인**: "충분한 코드 선택" 강조로 LLM이 과도하게 코드 추가
+   - **해결**:
+     - "환자 증상과 직접 관련된 코드만" 명시
+     - 무관한 코드 추가 금지 예시 추가
+     - KTAS 1-4급 차등 제거 (모두 동일 처리)
+     - rltmEmerCd 최소 1개 필수 (O001)
+   - **Files Modified**:
+     - `medical_rag_api.py` (Line 461-511) - 프롬프트 완전 재작성
+
+3. **RAG 문서 개수 최적화 (5개 → 3개)**
+
+   - **변경**: 로그 출력과 LLM 전송 모두 3개로 통일
+   - **이유**: 토큰 절약 + 응답 속도 향상
+   - **Files Modified**:
+     - `medical_rag_api.py` (Line 433) - `retrieved_docs[:3]`
+
+4. **Result 페이지 필터 코드 상세 정보 토글 추가**
+
+   - **기능**: AI 판단 결과에 선택된 필터 코드 상세 정보 토글
+   - **표시 형식**:
+
+     ```
+     🧠 AI 필터 판단 결과 (KTAS 2급)
+     reasoning 텍스트...
+
+     ▼ 🏥 선택된 필터 코드 상세 정보
+       • 응급실병상: 일반응급실(O001), 외상소생실(O060)
+       • 입원병상: 외상수술(O023)
+       • 중증응급질환: 안과응급(Y0160)
+       • 장비정보: CT(O027)
+
+     ▼ 📚 참고한 의료 문서 3개
+       ...
+     ```
+
+   - **Files Modified**:
+     - `src/app/result/components/HospitalListLevel1to4.js` - 코드 이름 매핑 + 토글 UI
+
+5. **성능 최종 지표:**
+
+   - **KTAS 5급**: 진료과목 판단 ~15초 (RAG 없음)
+   - **KTAS 1-4급**: 필터 판단 ~45초 (RAG 3개 문서 활용)
+   - **병원 필터링**: <0.1초 (API code 직접 매칭)
+   - **전체 검색 시간**: ~50초 (LLM 판단 포함)
+
+### 🎯 Next Steps (Immediate):
+
+**1. 병원 스코어링 및 거리 반경 수정**
+
+- 현재 스코어링 알고리즘 개선 필요
+- 거리 반경 조정 (현재 설정 확인 필요)
+
+**2. 지도 위치 표현 및 병원 마커 개선**
+
+- 현재 위치 마커 스타일 개선
+- 병원 마커 디자인 업그레이드
+- 마커 클러스터링 고려
+
+**3. 병원 리스트 디테일 살리기**
+
+- 병원 정보 표시 개선
+- 추가 정보 표시 (가용 병상, 대기 시간 등)
+- UI/UX 디테일 개선
 
 ### 🎯 Future Implementation Ideas:
 
@@ -220,19 +334,27 @@ Uses React's built-in state management with performance optimizations:
 ### 🔧 Technical Notes for Next Developer:
 
 **Database & Infrastructure:**
+
 - Supabase URL: https://bnmlpygidqjvgmbajxfg.supabase.co
 - Dev server: `npm run dev` → http://localhost:3000 (or 3001 if 3000 occupied)
 - All original CSV logic preserved in `src/utils/ktasData.js` as backup
 - Migration scripts available in `database/` folder for reference
 
-**LLM System:**
+**LLM System (2025-10-07 업데이트):**
+
 - FastAPI server: `python medical_rag_api.py` → http://localhost:8000
 - ngrok tunnel: `ngrok http 8000` → External access URL
 - Medical documents: 255,162 ChromaDB entries
-- Models: BGE-M3 embeddings + Gemma3:1b LLM
+- Models:
+  - **Embedding**: BGE-M3:latest (1.2GB)
+  - **LLM**: ✅ **MedGemma-4B-IT:q6** (4.0GB) - 의료 전문 모델
+  - **이전 모델**: Gemma3:1b (815MB) - 백업용
 - API documentation: http://localhost:8000/docs (Swagger UI)
+- **성능 참고**: KTAS 5급 판단 ~15초, KTAS 1-4급 판단 ~45초 (CPU 모드)
+- **최적화 권장**: GPU 활성화 시 5-10배 속도 향상 가능
 
 **Deployment Flow:**
+
 1. Start FastAPI: `cd E:\0KoreaUniversity\DAB\llm && python medical_rag_api.py`
 2. Start ngrok: `ngrok http 8000`
 3. Update `PRIMARY_URL` in `src/app/profile/page.js` with ngrok URL

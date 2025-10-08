@@ -9,8 +9,9 @@ const LLM_CONFIG = {
   ENDPOINTS: {
     HEALTH: "/health",
     DEPARTMENT: "/department",
+    EMERGENCY_FILTERS: "/emergency-filters", // 응급실 필터 판단 (KTAS 1-4급)
   },
-  TIMEOUT: 10000, // 10초 타임아웃
+  TIMEOUT: 100000, // 100초 타임아웃 (MedGemma-4B 모델 응답 시간 고려)
 };
 
 /**
@@ -163,11 +164,105 @@ export function calculateDistance(lat1, lng1, lat2, lng2) {
   return R * c;
 }
 
+/**
+ * KTAS 1-4급 환자 정보를 기반으로 응급실 필터 코드 판단
+ * @param {Object} patientData - 환자 데이터
+ * @param {number} patientData.ktasLevel - KTAS 레벨 (1-4)
+ * @param {string} patientData.primaryDisease - 주요 병명
+ * @param {Array<string>} patientData.firstConsiderations - 1차 고려사항
+ * @param {Array<string>} patientData.secondConsiderations - 2차 고려사항
+ * @returns {Promise<Object>} 필터 판단 결과
+ */
+export async function determineEmergencyFilters(patientData) {
+  try {
+    console.log("\n🧠 [LLM 필터 판단] 요청:", patientData);
+
+    const requestData = {
+      ktas_level: patientData.ktasLevel,
+      primary_disease: patientData.primaryDisease || "",
+      first_considerations: patientData.firstConsiderations || [],
+      second_considerations: patientData.secondConsiderations || [],
+    };
+
+    const response = await fetch(
+      `${LLM_CONFIG.BASE_URL}${LLM_CONFIG.ENDPOINTS.EMERGENCY_FILTERS}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+        signal: AbortSignal.timeout(LLM_CONFIG.TIMEOUT),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log("✅ [LLM 필터 판단] 결과:", result);
+    console.log(`  - 응급실병상: ${result.rltmEmerCd}`);
+    console.log(`  - 입원병상: ${result.rltmCd}`);
+    console.log(`  - 중증응급질환: ${result.svdssCd}`);
+    console.log(`  - 장비정보: ${result.rltmMeCd}`);
+    console.log(`  - 근거: ${result.reasoning}`);
+
+    // RAG 문서 정보 추출
+    const ragDocs = result.performance?.rag_doc_summaries || [];
+    if (ragDocs.length > 0) {
+      console.log(`📚 [RAG 참고 문서] ${ragDocs.length}개:`);
+      ragDocs.forEach((doc, i) => {
+        console.log(`  ${i + 1}. ${doc.substring(0, 100)}...`);
+      });
+    }
+
+    return {
+      success: true,
+      filters: {
+        rltmEmerCd: result.rltmEmerCd,
+        rltmCd: result.rltmCd,
+        svdssCd: result.svdssCd,
+        rltmMeCd: result.rltmMeCd,
+      },
+      reasoning: result.reasoning,
+      ragDocs: ragDocs, // RAG 문서 추가
+      performance: result.performance,
+    };
+  } catch (error) {
+    console.error("❌ [LLM 필터 판단] 실패:", error);
+
+    // 폴백: LLM 실패 시 기본 필터 설정
+    const ktasLevel = patientData.ktasLevel;
+    let fallbackFilters = {
+      rltmEmerCd: ["O001"], // 기본: 일반응급실
+      rltmCd: null,
+      svdssCd: null,
+      rltmMeCd: null,
+    };
+
+    // KTAS 레벨에 따른 기본 필터
+    if (ktasLevel === 1 || ktasLevel === 2) {
+      fallbackFilters.rltmCd = ["O017"]; // 일반중환자실
+    }
+
+    return {
+      success: false,
+      filters: fallbackFilters,
+      reasoning: `LLM 서버 연결 실패로 기본 필터 적용 (KTAS ${ktasLevel}급)`,
+      error: error.message,
+      fallback: true,
+    };
+  }
+}
+
 const llmService = {
   checkLLMHealth,
   determineDepartmentCode,
   getRegionsForSearch,
   calculateDistance,
+  determineEmergencyFilters,
 };
 
 export default llmService;

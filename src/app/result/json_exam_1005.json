@@ -1,0 +1,2074 @@
+{
+  "message": "상세 검색 결과가 성공적으로 반환되었습니다.",
+  "result": {
+    "count": 24,
+    "data": [
+      {
+        "code": "A1100052",
+        "name": "국립중앙의료원",
+        "typeCode": "C",
+        "subTypes": ["TRAUMA", "ISL_SICKBED"],
+        "address": "서울특별시 중구 을지로 245, 국립중앙의료원 (을지로6가)",
+        "distance": 1.7,
+        "bedTrnsDt": "2025-10-06T21:10:05",
+        "sdTrnsDt": "2025-10-06T20:47:12",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1124",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 15, "usable": 12, "availableLevel": "MEDIUM" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 1, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": {
+              "availableLevel": "NONE",
+              "hasUnavailableMessage": false
+            }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 1, "availableLevel": "N" },
+            "O032": { "total": 3, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "** 담도 질환, ERCP 가능 / 담낭 질환 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "** 소아환자 24개월 이상 경증환자 평일 09:00~17:00 가능, *세부분과 치료: 소아청소년과 확인 필요 ",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": " ** 중증외상환자는 서울권역외상센터 핫라인으로 사전 연락 필요",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "** 진료과 사정으로 소아외상 진료 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "** 진료과 사정으로 성형외과, 안과 진료 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": [
+          {
+            "message": "전문의 부재로 수용 불가",
+            "code": "Y0171",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "전문의 부재로 수용 불가",
+            "code": "Y0052",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "전문의 부재로 수용 불가",
+            "code": "Y0042",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "전문의 부재로 수용 불가",
+            "code": "Y0041",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "진료과 사정으로 뇌혈관조영술 불가",
+            "code": "Y0020",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "진료과 사정으로 비외상 신경외과 수술 불가",
+            "code": "Y0031",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "진료과 사정으로 비외상 신경외과 수술 불가",
+            "code": "Y0032",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "진료과 사정으로 복부 응급수술 불가",
+            "code": "Y0060",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "진료과 사정으로 응급기관지내시경 불가",
+            "code": "Y0091",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "진료과 사정으로 응급위장관내시경 불가",
+            "code": "Y0081",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100004",
+        "name": "순천향대학교 부속 서울병원",
+        "typeCode": "C",
+        "subTypes": [],
+        "address": "서울특별시 용산구 대사관로 59 (한남동)",
+        "distance": 2.2,
+        "bedTrnsDt": "2025-10-06T21:09:21",
+        "sdTrnsDt": "2025-10-06T20:06:51",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1121",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 20, "usable": 14, "availableLevel": "MEDIUM" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 3, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": {
+              "availableLevel": "N1",
+              "hasUnavailableMessage": true,
+              "unavailableMessages": [
+                {
+                  "message": "산부인과 인력 부족으로 불가",
+                  "category": null,
+                  "reason": null,
+                  "detail": null,
+                  "startAt": 1759676400,
+                  "endAt": 1760281140
+                }
+              ]
+            }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 8, "availableLevel": "Y" },
+            "O032": { "total": 15, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "성형외과 인력 부족으로 안면부 열상환자 및 단순 열상환자 응급실 내 진료 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "심장내과 인력 부족으로  흉통환자 수용 불가,  응급검사 및 시술 필요한 환자 수용 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "산부인과 인력 부족으로 산모 및 부인과 관련 환자 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "이비인후과 f/u 환자만 이비인후과 진료 가능",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "의료진 부족으로 정신과 폐쇄병동 운영을 잠정중단하여 정신과적 입원 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "인력부족으로 인해 의식장애 동반된 DI환자 수용 및 입원 불가능",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": [
+          {
+            "message": "성형외과 인력 부족으로 수지접합 불가",
+            "code": "Y0131",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "심장내과 인력 부족으로  흉통환자 수용 불가,  응급검사 및 시술 필요한 환자 수용 불가",
+            "code": "Y0010",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "산부인과 인력 부족으로 불가",
+            "code": "Y0113",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "산부인과 인력 부족으로 불가",
+            "code": "Y0112",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "산부인과 인력 부족으로 불가",
+            "code": "Y0111",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "흉부외과 인력 부족으로 시술 및 수술 불가",
+            "code": "Y0041",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "의료진 부족으로 정신과 폐쇄병동 운영을 잠정중단하여 정신과적 입원 불가",
+            "code": "Y0150",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100013",
+        "name": "한양대학교병원",
+        "typeCode": "A",
+        "subTypes": ["SEVERE", "ISL_SICKBED"],
+        "address": "서울특별시 성동구 왕십리로 222-1 (사근동)",
+        "distance": 3.1,
+        "bedTrnsDt": "2025-10-06T21:08:00",
+        "sdTrnsDt": "2025-10-06T21:03:14",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1116",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 18, "usable": 9, "availableLevel": "LOW" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 1, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "Y", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 10, "availableLevel": "Y" },
+            "O032": { "total": 20, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "전원의 경우, 본원 F/U 환자 외 모든 환자 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "단순열상 24시간 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "응급실 인력부족으로 비응급, 경증환자 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "응급실 인력부족으로 중증외상환자 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "정신과 인력 부족으로 정신과 입원환자 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "소화기내과 인력 부족으로 위장관계 이물질 제거 필요한 환자 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "정형외과 인력 부족으로 하지 깊은열상/사지감염 환자 수용불가(상지/수부 열상 가능)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "이비인후과 인력 부족으로 경부심재감염은 전원환자 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "소아혈액종양내과 의료진 인력부족으로 관련 환자 진료불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "소아신경분과 의료진 인력부족으로 관련 환자 진료불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "성형외과 의료진 인력부족으로 단순 열상 환자 수용불가(심한 안면부 골절 불가능)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "성형외과 의료진 인력부족으로 단순 열상 환자 수용불가(심한 안면부 골절 불가능)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": [
+          {
+            "message": "정신과 인력 부족으로 정신과적 응급입원 필요한 환자 수용불가",
+            "code": "Y0150",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "소화기내과 인력 부족으로 위장관계 이물질 제거 필요한 환자 수용불가",
+            "code": "Y0082",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "소화기내과 인력 부족으로 위장관계 이물질 제거 필요한 환자 수용불가",
+            "code": "Y0081",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100022",
+        "name": "서울특별시동부병원",
+        "typeCode": "D",
+        "subTypes": [],
+        "address": "서울특별시 동대문구 무학로 124 (용두동)",
+        "distance": 3.1,
+        "bedTrnsDt": "2025-10-06T21:10:20",
+        "sdTrnsDt": null,
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1111",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 8, "usable": 8, "availableLevel": "HIGH" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 1, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": {
+              "availableLevel": "NONE",
+              "hasUnavailableMessage": false
+            }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "availableLevel": "NONE" },
+            "O032": { "total": 1, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [],
+        "unavailableMessages": []
+      },
+      {
+        "code": "A1100017",
+        "name": "서울대학교병원",
+        "typeCode": "A",
+        "subTypes": ["CHILD", "SEVERE", "ISL_SICKBED"],
+        "address": "서울특별시 종로구 대학로 101 (연건동)",
+        "distance": 3.2,
+        "bedTrnsDt": "2025-10-06T21:10:51",
+        "sdTrnsDt": "2025-10-06T20:40:56",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1123",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 24, "usable": 1, "availableLevel": "LOW" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 2, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "Y", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 19, "availableLevel": "Y" },
+            "O032": { "total": 46, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "신경외과 : 두부외상환자 진료 불가(화요일 7A-목요일 7A만 수용 가능)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "안과 : 정규 시간 외(주말, 공휴일, 평일 오후 6시 이후) 안과 진료 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "이비인후과 : 정규 시간 외(주말, 공휴일, 평일 오후 6시 이후) 기존 수술 환자 문제 외 진료 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "혈액종양내과 혈액파트 : 응급실 신환 진료 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "비뇨의학과 : 신환 진료 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": [
+          {
+            "message": "안과 : 정규 시간 외(주말, 공휴일, 평일 오후 6시 이후) 안과 진료 불가",
+            "code": "Y0160",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100008",
+        "name": "학교법인고려중앙학원고려대학교의과대학부속병원(안암병원)",
+        "typeCode": "A",
+        "subTypes": ["SEVERE"],
+        "address": "서울특별시 성북구 고려대로 73, 고려대병원 (안암동5가)",
+        "distance": 4.1,
+        "bedTrnsDt": "2025-10-06T21:10:48",
+        "sdTrnsDt": "2025-10-06T20:44:42",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1117",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 30, "usable": 11, "availableLevel": "LOW" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 4, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "Y", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 14, "availableLevel": "Y" },
+            "O032": { "total": 20, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "[소아]Cardiac arrest, respiratory arrest, multiple trauma, seizure 등 중증응급 외 진료 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": [
+          {
+            "message": "인력 부재로 소아 응급내시경 불가",
+            "code": "Y0082",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100006",
+        "name": "강북삼성병원",
+        "typeCode": "C",
+        "subTypes": ["SEVERE"],
+        "address": "서울특별시 종로구 새문안로 29 (평동)",
+        "distance": 4.2,
+        "bedTrnsDt": "2025-10-06T21:11:42",
+        "sdTrnsDt": "2025-10-06T20:30:55",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1123",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 15, "usable": 10, "availableLevel": "MEDIUM" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 1, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "Y", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 9, "availableLevel": "Y" },
+            "O032": { "total": 11, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "<<연휴>> 소아청소년과 신경(경련 등) 입원케이스 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "<<연휴>> 성형외과 진료불가-10/10 정규시간 부터 정상운영",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[산부인과] 수용 가능여부 문의",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[정규시간 외 진료 불가] 안과, 성형외과, 이비인후과, 심장혈관흉부외과(Lung Part), 영상판독, 비뇨의학과(수술 예측 증상 진료불가), 정신건강의학과(내과, 성형외과 동반 시 진료 제한)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[정형외과] 야간 진료 불가 (단순열상 봉합 불가, 19:00 이전 접수 요망)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[진료불가] 피부과",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "응급의학과 전문의 1인 진료중. 사전 협의(연락) 되지 않은 119 및 전원 수용 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": []
+      },
+      {
+        "code": "A1100029",
+        "name": "서울적십자병원",
+        "typeCode": "D",
+        "subTypes": [],
+        "address": "서울특별시 종로구 새문안로 9, 적십자병원 (평동)",
+        "distance": 4.2,
+        "bedTrnsDt": "2025-10-06T21:11:29",
+        "sdTrnsDt": "2025-10-06T20:17:45",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1123",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 10, "usable": 8, "availableLevel": "MEDIUM" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "availableLevel": "NONE" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": {
+              "availableLevel": "NONE",
+              "hasUnavailableMessage": false
+            }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "availableLevel": "NONE" },
+            "O032": { "availableLevel": "NONE" }
+          }
+        },
+        "erMessages": [],
+        "unavailableMessages": []
+      },
+      {
+        "code": "A1100050",
+        "name": "서울성심병원",
+        "typeCode": "D",
+        "subTypes": [],
+        "address": "서울특별시 동대문구 왕산로 259, 서울성심병원 (청량리동)",
+        "distance": 4.9,
+        "bedTrnsDt": "2025-10-06T21:07:30",
+        "sdTrnsDt": "2025-10-06T21:08:34",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1111",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 17, "usable": 15, "availableLevel": "HIGH" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "availableLevel": "NONE" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": {
+              "availableLevel": "NONE",
+              "hasUnavailableMessage": false
+            }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "availableLevel": "NONE" },
+            "O032": { "availableLevel": "NONE" }
+          }
+        },
+        "erMessages": [],
+        "unavailableMessages": []
+      },
+      {
+        "code": "A1100032",
+        "name": "세란병원",
+        "typeCode": "D",
+        "subTypes": [],
+        "address": "서울특별시 종로구 통일로 256 (무악동)",
+        "distance": 5.3,
+        "bedTrnsDt": "2025-10-06T21:09:36",
+        "sdTrnsDt": null,
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1123",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 10, "usable": 7, "availableLevel": "MEDIUM" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "availableLevel": "NONE" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": {
+              "availableLevel": "NONE",
+              "hasUnavailableMessage": false
+            }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "availableLevel": "NONE" },
+            "O032": { "availableLevel": "NONE" }
+          }
+        },
+        "erMessages": [],
+        "unavailableMessages": []
+      },
+      {
+        "code": "A1100002",
+        "name": "건국대학교병원",
+        "typeCode": "C",
+        "subTypes": [],
+        "address": "서울특별시 광진구 능동로 120-1 (화양동)",
+        "distance": 5.6,
+        "bedTrnsDt": "2025-10-06T21:07:00",
+        "sdTrnsDt": "2025-10-06T18:45:15",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1106",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 23, "usable": 7, "availableLevel": "LOW" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 2, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "Y", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 7, "availableLevel": "Y" },
+            "O032": { "total": 19, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": " 해당과 인력부족으로 월/수/목/금/일 17:00~익일08:00 까지 ental change, dizzness, acute stroke등 신경과 진료불가능. 내원시 참고바랍니다.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": " acute stroke 의심환자 수용여부 확인 부탁드립니다.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": " 3개월이하 소아환자 발열 진료불가, 발열두통 시 뇌척수액검사 예상되는 소아 검사불가합니다. 이송시 참고바랍니다.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "의료진부족 및 관할지역 민원으로 본원인근 지역 외 원거리  119환자의  수용은 어렵습니다. (반드시 문의 부탁드립니다)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "인력부족으로 정신과질환 환자 수용여부 확인 부탁드립니다.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "응급환자 이송시  반드시 병원수용 여부 가능확인 후 이송 부탁드립니다.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "해당과 사정으로 성형외과 및 정형외과 단순봉합 불가 (필요시 별도 문의 바랍니다)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "소아과 전공의 부재로 일부 중증소아환자 수용 곤란합니다.(소화기 이물 흡입시(저녁8시이후), 대량 토혈 및 혈변, 간이식 가능성이 있는 전격성 간염/간부전, 궤사성 췌장염이 진단된 경우) 이송시 문의 바랍니다.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": " 소아과 전공의 부재로 일부 중증소아환자 수용 곤란합니다.(지속적인 간질 중첩증, 심근염을 비롯한 중증 심질환, 호흡기 기도 이물 및 중증객혈, 중증호흡부전(산소 2L/min이상필요한경우) 이송시 문의 바랍니다.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": [
+          {
+            "message": " 정신과환자 전문의 부재로 수용불가능",
+            "code": "Y0150",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100012",
+        "name": "학교법인가톨릭학원가톨릭대학교서울성모병원",
+        "typeCode": "C",
+        "subTypes": ["SEVERE"],
+        "address": "서울특별시 서초구 반포대로 222 (반포동)",
+        "distance": 5.7,
+        "bedTrnsDt": "2025-10-06T21:11:09",
+        "sdTrnsDt": "2025-10-06T20:28:10",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1115",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 27, "usable": 6, "availableLevel": "LOW" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 2, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "Y", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 40, "availableLevel": "Y" },
+            "O032": { "total": 39, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "경증환자 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "타병원에서 전원 수용여부 확인 없이 오는 모든 환자 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "소화기내과 간농양, 하부위장관 출혈 환자 진료 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "단순 이물제거, 코피, 타병원 편도절제술 후 출혈환자, Deep neck infection 관련 환자 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "혈액내과/종양내과 신환 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "정신건강의학과/산부인과/이비인후과 관련 환자 오후 11시부터 익일 오전 7시까지 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "안과 관련 환자 오후 6시부터 익일 오전 8시까지 수용 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "안면 포함한 단순열상 환자 24시간 수용불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": [
+          {
+            "message": "기관지 응급내시경 불가",
+            "code": "Y0091",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100001",
+        "name": "경희대학교병원",
+        "typeCode": "C",
+        "subTypes": [],
+        "address": "서울특별시 동대문구 경희대로 23 (회기동)",
+        "distance": 5.8,
+        "bedTrnsDt": "2025-10-06T21:11:21",
+        "sdTrnsDt": "2025-10-06T18:53:55",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1111",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 15, "usable": 10, "availableLevel": "MEDIUM" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 3, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "Y", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 6, "availableLevel": "Y" },
+            "O032": { "total": 12, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "소아 응급 진료는 평일 주간(09시~17시)/월,목 야간(18시~08시) 가능합니다.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "약물 중독 의심 환자 수용 가능합니다.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "119구급대원께서는 문의 후 이송 부탁드립니다.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": [
+          {
+            "message": "의료진 부족",
+            "code": "Y0132",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "의료진 부족",
+            "code": "Y0131",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "의료진 부족",
+            "code": "Y0042",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100021",
+        "name": "삼육서울병원",
+        "typeCode": "C",
+        "subTypes": [],
+        "address": "서울특별시 동대문구 망우로 82 (휘경동)",
+        "distance": 6.2,
+        "bedTrnsDt": "2025-10-06T21:09:39",
+        "sdTrnsDt": "2025-10-06T20:48:41",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1111",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 13, "usable": 7, "availableLevel": "MEDIUM" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 2, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "Y", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "availableLevel": "NONE" },
+            "O032": { "total": 4, "availableLevel": "N" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "일과시간 이후 본원 치료중인 소아환자 이외 소아청소년과 입원불가, 응급의학과 의사에 의한 부분 진료 가능",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": []
+      },
+      {
+        "code": "A1100007",
+        "name": "연세대학교의과대학세브란스병원",
+        "typeCode": "C",
+        "subTypes": ["CHILD", "SEVERE"],
+        "address": "서울특별시 서대문구 연세로 50-1 (신촌동)",
+        "distance": 6.2,
+        "bedTrnsDt": "2025-10-06T21:09:27",
+        "sdTrnsDt": "2025-10-06T13:18:40",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1114",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 39, "usable": 19, "availableLevel": "LOW" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 8, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": {
+              "availableLevel": "NONE",
+              "hasUnavailableMessage": false
+            }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 41, "availableLevel": "Y" },
+            "O032": { "total": 61, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "(정형외과) [사지접합/사지접합 외] 정규시간에만 가능(필요 시 문의바랍니다.)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "(치과) 치과(일반)진료 21:30 이후 진료 불가능(f/u 포함)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "성형외과 단순 봉합 진료 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "성인, 소아 외상환자 수용 불가능",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[복부응급수술(비외상)] 신환 수용 불가 (본원 기존 f/u 환자는 문의 바랍니다/appendicitis는 수용불가)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "(소아신경외과) 신환환자 수용 불가능(본원 기존 f/u 환자는 문의 바랍니다.)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "(소아외과) [장중첩/폐색(유아)] 마취 지원 여부에 따라 부분 수용 가능 (필요 시 문의 바랍니다.)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[뇌출혈수술] 중환자실 및 응급 수술/마취 지원 여부에 따라 부분 수용 가능 (필요 시 문의 바랍니다.)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "안과 정규 시간 외 진료 불가능 (정규 시간 진료는 외래 기반 안과 환자만 가능)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[응급 기관지내시경(성인)]  정규시간(7am-5pm)내 가능",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[위장관 응급내시경(성인)] 신환 수용 불가 (본원 기존 f/u 환자는 문의 바랍니다.)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[담낭담관질환] 신환 수용 불가 (본원 기존 f/u 환자는 문의 바랍니다.)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "격리진료구역병상 성인/소아 구분 신고 체계 미비로 실제 정보와 다를 수 있음.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": []
+      },
+      {
+        "code": "A1100003",
+        "name": "중앙대학교병원",
+        "typeCode": "C",
+        "subTypes": ["ISL_SICKBED"],
+        "address": "서울특별시 동작구 흑석로 102 (흑석동)",
+        "distance": 6.7,
+        "bedTrnsDt": "2025-10-06T21:11:07",
+        "sdTrnsDt": "2025-10-06T18:10:58",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1112",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 18, "usable": 12, "availableLevel": "MEDIUM" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 2, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "Y", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 7, "availableLevel": "Y" },
+            "O032": { "total": 15, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "이비인후과 두경부 질환 진료 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "산부인과 진료 불가(f/u환자 제외)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "피부과, 약물중독 진료 불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "소아청소년과 진료 가능(증환자 제외)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": []
+      },
+      {
+        "code": "A1100051",
+        "name": "혜민병원",
+        "typeCode": "D",
+        "subTypes": [],
+        "address": "서울특별시 광진구 자양로 85 (자양동)",
+        "distance": 6.7,
+        "bedTrnsDt": "2025-10-06T21:10:42",
+        "sdTrnsDt": "2025-10-06T14:04:11",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1106",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 9, "usable": 9, "availableLevel": "HIGH" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "availableLevel": "NONE" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": {
+              "availableLevel": "NONE",
+              "hasUnavailableMessage": false
+            }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "availableLevel": "NONE" },
+            "O032": { "availableLevel": "NONE" }
+          }
+        },
+        "erMessages": [],
+        "unavailableMessages": [
+          {
+            "message": "불가능메세지등록",
+            "code": "Y0051",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "불가능메세지등록",
+            "code": "Y0032",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100025",
+        "name": "의료법인동신의료재단동신병원",
+        "typeCode": "D",
+        "subTypes": [],
+        "address": "서울특별시 서대문구 연희로 272, 동신병원 본관동 (홍은동)",
+        "distance": 7.3,
+        "bedTrnsDt": "2025-10-06T21:10:26",
+        "sdTrnsDt": null,
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1114",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 9, "usable": 9, "availableLevel": "HIGH" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "availableLevel": "NONE" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": {
+              "availableLevel": "NONE",
+              "hasUnavailableMessage": false
+            }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "availableLevel": "NONE" },
+            "O032": { "availableLevel": "NONE" }
+          }
+        },
+        "erMessages": [],
+        "unavailableMessages": []
+      },
+      {
+        "code": "A1100015",
+        "name": "연세대학교의과대학강남세브란스병원",
+        "typeCode": "C",
+        "subTypes": [],
+        "address": "서울특별시 강남구 언주로 211, 강남세브란스병원 (도곡동)",
+        "distance": 7.4,
+        "bedTrnsDt": "2025-10-06T21:06:59",
+        "sdTrnsDt": "2025-10-06T16:42:33",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1101",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 15, "usable": 2, "availableLevel": "LOW" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 1, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "Y", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 10, "availableLevel": "Y" },
+            "O032": { "total": 23, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "피부과 응급실 진료불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "응급투석 17:00-09:00 진료불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "CRRT불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "이비인후과 의료진 부족으로 응급실 진료불가",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "모든 성형외과 평일 09:00-17:00 이외 진료 불가 (안면외상, 안면 골절, 열상 봉합등) -성형외과 의료진 부재 ",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "소아청소년과 진료 가능시간 (만 16세 미만 내과적 질환) 09:00~22:00 이외 시간 진료 불가능합니다",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": [
+          {
+            "message": "불가능메세지등록",
+            "code": "Y0120",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "불가능메세지등록",
+            "code": "Y0160",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100044",
+        "name": "녹색병원",
+        "typeCode": "D",
+        "subTypes": ["ISL_SICKBED"],
+        "address": "서울특별시 중랑구 사가정로49길 53 (면목동)",
+        "distance": 7.5,
+        "bedTrnsDt": "2025-10-06T21:10:04",
+        "sdTrnsDt": "2025-10-06T21:07:20",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1125",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 5, "usable": 3, "availableLevel": "MEDIUM" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 1, "availableLevel": "N" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": {
+              "availableLevel": "NONE",
+              "hasUnavailableMessage": false
+            }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "availableLevel": "NONE" },
+            "O032": { "availableLevel": "NONE" }
+          }
+        },
+        "erMessages": [],
+        "unavailableMessages": []
+      },
+      {
+        "code": "A1100011",
+        "name": "가톨릭대학교여의도성모병원",
+        "typeCode": "C",
+        "subTypes": [],
+        "address": "서울특별시 영등포구 63로 10, 여의도성모병원 (여의도동)",
+        "distance": 7.6,
+        "bedTrnsDt": "2025-10-06T21:11:07",
+        "sdTrnsDt": "2025-10-06T19:57:53",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1120",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 15, "usable": 13, "availableLevel": "HIGH" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 2, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "N", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "availableLevel": "NONE" },
+            "O032": { "availableLevel": "NONE" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "1. 전문의 1인 진료로 119 /전원 이송전 수용여부 확인 필수 2. 야간: 심정지 불가 3. 일부 임상과 f/u환자만 가능(반드시 사전 연락 바람) ",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": [
+          {
+            "message": "불가능",
+            "code": "Y0132",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "불가능",
+            "code": "Y0131",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100054",
+        "name": "성애의료재단성애병원",
+        "typeCode": "C",
+        "subTypes": [],
+        "address": "서울특별시 영등포구 여의대방로53길 22 (신길동, 성애병원)",
+        "distance": 9.0,
+        "bedTrnsDt": "2025-10-06T21:10:15",
+        "sdTrnsDt": "2025-10-06T21:01:38",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1120",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 15, "usable": 14, "availableLevel": "HIGH" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 2, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": {
+              "availableLevel": "N1",
+              "hasUnavailableMessage": true,
+              "unavailableMessages": [
+                {
+                  "message": "당직의 부재",
+                  "category": null,
+                  "reason": null,
+                  "detail": null,
+                  "startAt": 1759417200,
+                  "endAt": 1760054400
+                }
+              ]
+            }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 5, "availableLevel": "Y" },
+            "O032": { "total": 14, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [],
+        "unavailableMessages": [
+          {
+            "message": "당직의 부재",
+            "code": "Y0113",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "당직의 부재",
+            "code": "Y0112",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "당직의 부재",
+            "code": "Y0111",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "당직의 부재",
+            "code": "Y0081",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "당직의 부재",
+            "code": "Y0141",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "당직의 부재",
+            "code": "Y0142",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "당직의 부재",
+            "code": "Y0032",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100009",
+        "name": "재단법인아산사회복지재단서울아산병원",
+        "typeCode": "C",
+        "subTypes": ["CHILD", "SEVERE"],
+        "address": "서울특별시 송파구 올림픽로43길 88, 서울아산병원 (풍납동)",
+        "distance": 9.1,
+        "bedTrnsDt": "2025-10-06T21:10:15",
+        "sdTrnsDt": "2025-10-06T21:00:15",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1118",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 45, "usable": 17, "availableLevel": "LOW" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 8, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "Y", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 33, "availableLevel": "Y" },
+            "O032": { "total": 49, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [],
+        "unavailableMessages": [
+          {
+            "message": "야간 시간 소아 소화기 이물 제거 불가(해당과 의사인력 부족)",
+            "code": "Y0082",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ]
+      },
+      {
+        "code": "A1100010",
+        "name": "삼성서울병원",
+        "typeCode": "C",
+        "subTypes": [],
+        "address": "서울특별시 강남구 일원로 81 (일원동, 삼성의료원)",
+        "distance": 9.8,
+        "bedTrnsDt": "2025-10-06T21:10:31",
+        "sdTrnsDt": "2025-10-06T19:18:27",
+        "score": null,
+        "wiredHotline": "-",
+        "wirelessHotline": "-",
+        "emogloca": "11",
+        "emogdstr": "1101",
+        "rltmEmerCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O001": { "total": 42, "usable": 4, "availableLevel": "LOW" }
+          }
+        },
+        "rltmCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": { "O026": { "total": 8, "availableLevel": "Y" } }
+        },
+        "rltmC19Cd": {
+          "hasElement": false,
+          "isBlocked": false,
+          "elements": null
+        },
+        "svdssCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "Y0111": { "availableLevel": "Y", "hasUnavailableMessage": false }
+          }
+        },
+        "rltmMeCd": {
+          "hasElement": true,
+          "isBlocked": false,
+          "elements": {
+            "O031": { "total": 22, "availableLevel": "Y" },
+            "O032": { "total": 43, "availableLevel": "Y" }
+          }
+        },
+        "erMessages": [
+          {
+            "message": "[안과] 응급 안과 적출에 준하는 상황의 경우, 안과 당직 문의 후 수용 여부 확인",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[위장관 응급내시경(성인)] 환자 수용 전 반드시 문의 바랍니다.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[담낭담관질환] 담낭 수술 및 시술은 환자 수용 전 반드시 문의 바랍니다.",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[소아청소년과] 기도이물 환자 금,토,일요일 진료 불가 (d/t 인력부족)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[소아청소년과] 중환자실 치료 필요 시 수용 전 병실 가용 여부 확인 필요",
+            "category": null,
+            "reason": null,
+            "detail": null
+          },
+          {
+            "message": "[소아청소년과] 하기 질환에 대해 신환 진료 불가 - 간질지속증 등 (d/t 인력부족)",
+            "category": null,
+            "reason": null,
+            "detail": null
+          }
+        ],
+        "unavailableMessages": []
+      }
+    ]
+  }
+}
