@@ -2,8 +2,9 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { addressToCoordinates, refineAddressForGeocoding, isValidKoreanCoordinates } from '@/utils/geocoder';
 
-export default function LeafletMap({ currentLocation, hospitals = [] }) {
+export default function LeafletMap({ currentLocation, hospitals = [], selectedHospitalId = null }) {
   const [leafletIcons, setLeafletIcons] = useState(null);
   // Leaflet 아이콘 설정 (Next.js에서 필요)
   useEffect(() => {
@@ -69,13 +70,117 @@ export default function LeafletMap({ currentLocation, hospitals = [] }) {
   const defaultLocation = { lat: 37.5896, lng: 127.0321 };
   const position = currentLocation || defaultLocation;
 
+  // 병원 좌표 캐시 상태
+  const [hospitalCoords, setHospitalCoords] = useState(new Map());
+  const [geocodingInProgress, setGeocodingInProgress] = useState(false);
+
+  // 병원 주소를 좌표로 변환 (VWorld Geocoder API 사용)
+  useEffect(() => {
+    const geocodeHospitals = async () => {
+      if (!hospitals || hospitals.length === 0 || geocodingInProgress) return;
+
+      // 좌표가 없는 병원들 찾기
+      const hospitalsNeedingCoords = hospitals.filter(hospital =>
+        (!hospital.latitude || !hospital.longitude) &&
+        hospital.address &&
+        !hospitalCoords.has(hospital.id)
+      );
+
+      if (hospitalsNeedingCoords.length === 0) return;
+
+      console.log(`🗺️ ${hospitalsNeedingCoords.length}개 병원 좌표 변환 시작`);
+      setGeocodingInProgress(true);
+
+      try {
+        for (const hospital of hospitalsNeedingCoords) {
+          if (hospitalCoords.has(hospital.id)) continue;
+
+          const refinedAddress = refineAddressForGeocoding(hospital.address);
+          const coords = await addressToCoordinates(refinedAddress);
+
+          if (coords && isValidKoreanCoordinates(coords.lat, coords.lng)) {
+            setHospitalCoords(prev => new Map(prev.set(hospital.id, {
+              latitude: coords.lat,
+              longitude: coords.lng,
+              refinedAddress: coords.refinedAddress,
+              isGeocoded: true
+            })));
+            console.log(`✅ ${hospital.name}: (${coords.lat}, ${coords.lng})`);
+          } else {
+            console.warn(`⚠️ ${hospital.name}: 좌표 변환 실패, 기본 위치 사용`);
+            // 서울 중심부 기본 좌표 + 약간의 오프셋
+            const defaultCoords = {
+              latitude: 37.5665 + (Math.random() - 0.5) * 0.02,
+              longitude: 126.9780 + (Math.random() - 0.5) * 0.02,
+              isEstimated: true
+            };
+            setHospitalCoords(prev => new Map(prev.set(hospital.id, defaultCoords)));
+          }
+
+          // API 제한 준수를 위한 지연 (100ms)
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      } catch (error) {
+        console.error('❌ Geocoding 오류:', error);
+      } finally {
+        setGeocodingInProgress(false);
+      }
+    };
+
+    geocodeHospitals();
+  }, [hospitals, hospitalCoords, geocodingInProgress]);
+
+  // 지도에 표시할 병원들 필터링 (상위 3개 + 선택된 병원)
+  const getDisplayHospitals = () => {
+    if (!hospitals || hospitals.length === 0) return [];
+
+    // 병원에 좌표 추가
+    const hospitalsWithCoords = hospitals.map(hospital => {
+      // 이미 좌표가 있는 경우
+      if (hospital.latitude && hospital.longitude) {
+        return hospital;
+      }
+
+      // 캐시된 좌표 사용
+      const cachedCoords = hospitalCoords.get(hospital.id);
+      if (cachedCoords) {
+        return {
+          ...hospital,
+          latitude: cachedCoords.latitude,
+          longitude: cachedCoords.longitude,
+          isGeocoded: cachedCoords.isGeocoded,
+          isEstimated: cachedCoords.isEstimated
+        };
+      }
+
+      // 좌표가 없는 경우 null 반환 (지도에 표시하지 않음)
+      return null;
+    }).filter(Boolean);
+
+    // 상위 3개 병원
+    const top3Hospitals = hospitalsWithCoords.slice(0, 3);
+
+    // 선택된 병원이 있고 상위 3개에 포함되지 않은 경우 추가
+    let displayHospitals = [...top3Hospitals];
+    if (selectedHospitalId) {
+      const selectedHospital = hospitalsWithCoords.find(h => h.id === selectedHospitalId);
+      if (selectedHospital && !top3Hospitals.some(h => h.id === selectedHospitalId)) {
+        displayHospitals.push({ ...selectedHospital, isSelected: true });
+      }
+    }
+
+    return displayHospitals;
+  };
+
+  const displayHospitals = getDisplayHospitals();
+
   // 병원이 있을 때 지도 범위 조정
   const getMapBounds = () => {
-    if (!hospitals || hospitals.length === 0) {
+    if (!displayHospitals || displayHospitals.length === 0) {
       return { center: [position.lat, position.lng], zoom: 15 };
     }
 
-    const validHospitals = hospitals.filter(h => h.latitude && h.longitude);
+    const validHospitals = displayHospitals.filter(h => h.latitude && h.longitude);
     if (validHospitals.length === 0) {
       return { center: [position.lat, position.lng], zoom: 15 };
     }
@@ -142,8 +247,8 @@ export default function LeafletMap({ currentLocation, hospitals = [] }) {
           </Popup>
         </Marker>
 
-        {/* 병원 마커들 */}
-        {hospitals && hospitals.length > 0 && hospitals
+        {/* 병원 마커들 (상위 3개 + 선택된 병원) */}
+        {displayHospitals && displayHospitals.length > 0 && displayHospitals
           .filter(hospital => hospital.latitude && hospital.longitude)
           .map((hospital, index) => (
             <Marker
@@ -189,6 +294,29 @@ export default function LeafletMap({ currentLocation, hospitals = [] }) {
                     <p style={{ margin: '4px 0', fontSize: '12px', color: '#6b7280' }}>
                       {hospital.address}
                     </p>
+
+                    {/* Geocoding 상태 표시 */}
+                    {hospital.isGeocoded && (
+                      <p style={{
+                        margin: '4px 0',
+                        fontSize: '11px',
+                        color: '#10b981',
+                        fontWeight: '500'
+                      }}>
+                        🎯 정확한 위치
+                      </p>
+                    )}
+
+                    {hospital.isEstimated && (
+                      <p style={{
+                        margin: '4px 0',
+                        fontSize: '11px',
+                        color: '#f59e0b',
+                        fontWeight: '500'
+                      }}>
+                        📍 추정 위치
+                      </p>
+                    )}
 
                     {hospital.status && (
                       <p style={{

@@ -185,18 +185,42 @@ export default function AdultInput() {
       (selectedFirstConsiderations.length > 0 ||
         selectedSecondConsiderations.length > 0)
     ) {
-      // For now, use the first selected disease and consideration for KTAS calculation
       const primaryDisease = selectedDiseases[0];
-      const primaryFirstConsideration = selectedFirstConsiderations[0] || null;
-      const primarySecondConsideration =
-        selectedSecondConsiderations[0] || null;
 
-      const ktasLevel = getKtasLevel(
-        ktasData,
-        primaryDisease,
-        primaryFirstConsideration,
-        primarySecondConsideration
-      );
+      // 모든 1차/2차 고려사항 조합에 대해 KTAS 등급 계산 후 가장 심각한(낮은) 등급 선택
+      let lowestKtasLevel = 5; // 최대값으로 초기화
+
+      // 1차 고려사항만 있는 경우
+      if (selectedFirstConsiderations.length > 0) {
+        selectedFirstConsiderations.forEach(firstCon => {
+          const level = getKtasLevel(ktasData, primaryDisease, firstCon, null);
+          if (level < lowestKtasLevel) {
+            lowestKtasLevel = level;
+          }
+        });
+      }
+
+      // 2차 고려사항만 있는 경우
+      if (selectedSecondConsiderations.length > 0) {
+        selectedSecondConsiderations.forEach(secondCon => {
+          const level = getKtasLevel(ktasData, primaryDisease, null, secondCon);
+          if (level < lowestKtasLevel) {
+            lowestKtasLevel = level;
+          }
+        });
+      }
+
+      // 1차 + 2차 고려사항 모두 있는 경우
+      if (selectedFirstConsiderations.length > 0 && selectedSecondConsiderations.length > 0) {
+        selectedFirstConsiderations.forEach(firstCon => {
+          selectedSecondConsiderations.forEach(secondCon => {
+            const level = getKtasLevel(ktasData, primaryDisease, firstCon, secondCon);
+            if (level < lowestKtasLevel) {
+              lowestKtasLevel = level;
+            }
+          });
+        });
+      }
 
       const result = {
         worker: selectedWorker,
@@ -205,7 +229,7 @@ export default function AdultInput() {
         firstConsiderations: selectedFirstConsiderations,
         secondConsiderations: selectedSecondConsiderations,
         primaryDisease,
-        ktasLevel,
+        ktasLevel: lowestKtasLevel,
       };
 
       localStorage.setItem("ktasResult", JSON.stringify(result));

@@ -162,15 +162,18 @@ const filterCodeNames = {
  * @param {Array} hospitals - 병원 목록
  * @param {Object} currentLocation - 현재 위치
  * @param {Object} patientData - 환자 정보
+ * @param {Object} requestedFilters - LLM이 요청한 필터 (rltmEmerCd, rltmCd, svdssCd, rltmMeCd)
  * @returns {Array} 필터링 및 정렬된 병원 목록
  */
 export function filterAndScoreHospitals(
   hospitals,
   currentLocation,
-  patientData
+  patientData,
+  requestedFilters = {}
 ) {
   console.log(`\n🔍 [병원 필터링] 시작`);
   console.log(`  📊 원본 병원 수: ${hospitals.length}개`);
+  console.log(`  🎯 요청된 필터:`, requestedFilters);
 
   const scored = hospitals.map((hospital) => {
     let score = 1000; // 기본 점수
@@ -212,10 +215,11 @@ export function filterAndScoreHospitals(
       reasons.push(`응급병상: 정보없음 (-30)`);
     }
 
-    // 4. 중증응급질환 가용성
+    // 4. 중증응급질환 가용성 (요청한 경우에만 평가)
     const svdssCd = hospital.svdssCd?.elements || {};
     let svdssDetails = [];
     let svdssScore = 0;
+    const svdssRequested = requestedFilters.svdssCd && requestedFilters.svdssCd.length > 0;
 
     Object.entries(svdssCd).forEach(([code, element]) => {
       const level = element.availableLevel;
@@ -245,16 +249,18 @@ export function filterAndScoreHospitals(
           svdssDetails.length > 2 ? " 외" : ""
         } (${sign}${svdssScore})`
       );
-    } else {
-      // 중증응급질환 정보가 없으면 소폭 감점
+    } else if (svdssRequested) {
+      // 요청했는데 정보가 없으면 감점
       score -= 10;
       reasons.push(`중증: 정보없음 (-10)`);
     }
+    // 요청하지 않았으면 감점하지 않음
 
-    // 5. 입원병상 가용성
+    // 5. 입원병상 가용성 (요청한 경우에만 평가)
     const rltmCd = hospital.rltmCd?.elements || {};
     let admissionDetails = [];
     let admissionScore = 0;
+    const rltmCdRequested = requestedFilters.rltmCd && requestedFilters.rltmCd.length > 0;
 
     Object.entries(rltmCd).forEach(([code, element]) => {
       const level = element?.availableLevel;
@@ -284,16 +290,18 @@ export function filterAndScoreHospitals(
           admissionDetails.length > 2 ? " 외" : ""
         } (${sign}${admissionScore})`
       );
-    } else {
-      // 입원병상 정보가 없으면 소폭 감점
+    } else if (rltmCdRequested) {
+      // 요청했는데 정보가 없으면 감점
       score -= 5;
       reasons.push(`입원: 정보없음 (-5)`);
     }
+    // 요청하지 않았으면 감점하지 않음
 
-    // 6. 장비 가용성
+    // 6. 장비 가용성 (요청한 경우에만 평가)
     const rltmMeCd = hospital.rltmMeCd?.elements || {};
     let equipmentDetails = [];
     let equipmentScore = 0;
+    const rltmMeCdRequested = requestedFilters.rltmMeCd && requestedFilters.rltmMeCd.length > 0;
 
     Object.entries(rltmMeCd).forEach(([code, element]) => {
       const level = element?.availableLevel;
@@ -323,11 +331,12 @@ export function filterAndScoreHospitals(
           equipmentDetails.length > 2 ? " 외" : ""
         } (${sign}${equipmentScore})`
       );
-    } else {
-      // 장비 정보가 없으면 소폭 감점
+    } else if (rltmMeCdRequested) {
+      // 요청했는데 정보가 없으면 감점
       score -= 5;
       reasons.push(`장비: 정보없음 (-5)`);
     }
+    // 요청하지 않았으면 감점하지 않음
 
     // 7. 병원 메시지 페널티 (이미 계산된 값 사용)
     if (hospital.messagePenalty && hospital.messagePenalty > 0) {
@@ -438,18 +447,7 @@ export async function progressiveSearch(
 
   let hospitals = [];
   const strategies = [
-    { radius: 10, filters: searchParams, label: "10km + 전체 필터" },
-    { radius: 20, filters: searchParams, label: "20km + 전체 필터" },
-    {
-      radius: 10,
-      filters: { ...searchParams, svdssCd: null },
-      label: "10km + 중증질환 제외",
-    },
-    {
-      radius: 20,
-      filters: { ...searchParams, rltmCd: null, svdssCd: null },
-      label: "20km + 입원병상/중증질환 제외",
-    },
+    { radius: 100, filters: searchParams, label: "100km + 전체 필터" },
   ];
 
   for (const strategy of strategies) {

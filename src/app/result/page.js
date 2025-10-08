@@ -39,6 +39,7 @@ export default function Result() {
   const [recordSaved, setRecordSaved] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [hospitals, setHospitals] = useState([]);
+  const [selectedHospitalId, setSelectedHospitalId] = useState(null);
 
   useEffect(() => {
     const savedResult = localStorage.getItem("ktasResult");
@@ -192,6 +193,7 @@ export default function Result() {
             <LeafletMap
               currentLocation={currentLocation}
               hospitals={hospitals}
+              selectedHospitalId={selectedHospitalId}
             />
           </div>
         </div>
@@ -211,6 +213,7 @@ export default function Result() {
               patientData={result}
               ktasLevel={ktasLevel}
               onHospitalsUpdate={setHospitals}
+              onHospitalSelect={setSelectedHospitalId}
             />
           )}
         </div>

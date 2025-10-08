@@ -11,6 +11,7 @@ export default function HospitalListLevel1to4({
   patientData,
   ktasLevel,
   onHospitalsUpdate,
+  onHospitalSelect,
 }) {
   const [hospitals, setHospitals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -268,7 +269,8 @@ export default function HospitalListLevel1to4({
       const scoredHospitals = filterAndScoreHospitals(
         hospitalsWithPenalties,
         currentLocation,
-        patientData
+        patientData,
+        filterResult.filters // 요청한 필터 정보 전달
       );
 
       // 상위 20개만 표시
@@ -630,7 +632,9 @@ export default function HospitalListLevel1to4({
                         : "#10b981"
                     }`
                   : "none",
+              cursor: "pointer",
             }}
+            onClick={() => onHospitalSelect && onHospitalSelect(hospital.id)}
           >
             <div className="hospital-header">
               <h3 className="hospital-name">
