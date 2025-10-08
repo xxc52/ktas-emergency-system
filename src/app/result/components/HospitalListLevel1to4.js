@@ -657,23 +657,48 @@ export default function HospitalListLevel1to4({
             </div>
 
             <div className="hospital-details">
-              {/* 병상 정보 */}
+              {/* 병상 정보 - 숫자만 표시 */}
               {hospital.emergencyBeds && (
                 <div className="hospital-row">
                   <span className="detail-label">응급실 병상:</span>
-                  <span
-                    className="detail-value"
-                    style={{
-                      color: getAvailabilityColor(
-                        hospital.emergencyBeds.availableLevel
-                      ),
-                      fontWeight: "600",
-                    }}
-                  >
-                    사용가능 {hospital.emergencyBeds.usable}/
-                    {hospital.emergencyBeds.total} (
-                    {getAvailabilityText(hospital.emergencyBeds.availableLevel)}
-                    )
+                  <span className="detail-value" style={{ fontWeight: "600" }}>
+                    {hospital.emergencyBeds.usable}/{hospital.emergencyBeds.total}
+                  </span>
+                </div>
+              )}
+
+              {/* 입원병상 정보 */}
+              {hospital.admissionBeds && Object.keys(hospital.admissionBeds).length > 0 && (
+                <div className="hospital-row">
+                  <span className="detail-label">입원병상:</span>
+                  <span className="detail-value" style={{ fontSize: "12px" }}>
+                    {Object.entries(hospital.admissionBeds).map(([code, data]) =>
+                      `${data.usable}/${data.total}`
+                    ).join(", ")}
+                  </span>
+                </div>
+              )}
+
+              {/* 중증응급질환 */}
+              {hospital.criticalDiseases && Object.keys(hospital.criticalDiseases).length > 0 && (
+                <div className="hospital-row">
+                  <span className="detail-label">중증응급:</span>
+                  <span className="detail-value" style={{ fontSize: "12px" }}>
+                    {Object.entries(hospital.criticalDiseases).map(([code, data]) =>
+                      data.availableLevel === "Y" ? "가능" : data.availableLevel === "N" ? "불가" : data.availableLevel
+                    ).join(", ")}
+                  </span>
+                </div>
+              )}
+
+              {/* 장비정보 */}
+              {hospital.equipment && Object.keys(hospital.equipment).length > 0 && (
+                <div className="hospital-row">
+                  <span className="detail-label">장비:</span>
+                  <span className="detail-value" style={{ fontSize: "12px" }}>
+                    {Object.entries(hospital.equipment).map(([code, data]) =>
+                      data.availableLevel === "Y" ? "사용가능" : data.availableLevel === "N" ? "사용불가" : data.availableLevel
+                    ).join(", ")}
                   </span>
                 </div>
               )}
@@ -718,24 +743,11 @@ export default function HospitalListLevel1to4({
                     🏆 총점: {hospital.score}점
                   </div>
                   <div style={{ color: "#6b7280" }}>
-                    {hospital.scoreReasons.slice(0, 4).join(" · ")}
-                    {hospital.scoreReasons.length > 4 && " ..."}
+                    {hospital.scoreReasons.join(" · ")}
                   </div>
                 </div>
               )}
 
-              {/* 태그 */}
-              <div className="hospital-tags">
-                {hospital.emergencyBeds &&
-                  hospital.emergencyBeds.availableLevel === "HIGH" && (
-                    <span
-                      className="hospital-tag"
-                      style={{ backgroundColor: "#10b981", color: "white" }}
-                    >
-                      병상 충분
-                    </span>
-                  )}
-              </div>
             </div>
           </div>
         ))
