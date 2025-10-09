@@ -46,27 +46,37 @@ export default function AdultInput() {
     if (presetData) {
       const preset = JSON.parse(presetData);
       localStorage.removeItem("selectedPreset"); // 한 번만 사용하고 삭제
-      
+
       // 데이터 로드 후 프리셋 적용
       loadKtasData().then((data) => {
         setKtasData(data);
         setCategories(getUniqueCategories(data));
-        
-        // 프리셋 데이터 적용
+
+        // 프리셋 데이터를 한 번에 적용
         if (preset.category) {
-          localStorage.setItem("presetLoaded", "true");
           setSelectedCategory(preset.category);
+
+          // 카테고리별 옵션 즉시 설정
+          const allDiseases = getAllDiseasesByCategory(data, preset.category);
+          const allFirstConsiderations = getFirstConsiderationsByCategory(data, preset.category);
+          const allSecondConsiderations = getSecondConsiderationsByCategory(data, preset.category);
+
+          setDiseases(allDiseases);
+          setFirstConsiderations(allFirstConsiderations);
+          setSecondConsiderations(allSecondConsiderations);
+
+          // 나머지 프리셋 데이터 적용
+          if (preset.disease) {
+            setSelectedDiseases([preset.disease]);
+          }
+          if (preset.firstConsiderations) {
+            setSelectedFirstConsiderations(preset.firstConsiderations);
+          }
+          if (preset.secondConsiderations) {
+            setSelectedSecondConsiderations(preset.secondConsiderations);
+          }
         }
-        if (preset.disease) {
-          setSelectedDiseases([preset.disease]);
-        }
-        if (preset.firstConsiderations) {
-          setSelectedFirstConsiderations(preset.firstConsiderations);
-        }
-        if (preset.secondConsiderations) {
-          setSelectedSecondConsiderations(preset.secondConsiderations);
-        }
-        
+
         setLoading(false);
       });
     } else {
@@ -78,9 +88,16 @@ export default function AdultInput() {
     }
   }, []);
 
-  // Update available options when category changes
+  // Update available options when category changes (프리셋 로드 후에는 실행되지 않음)
   useEffect(() => {
     if (selectedCategory && ktasData.length > 0) {
+      // 프리셋이 로드 중인지 확인 (초기 마운트 시에만 체크)
+      const presetData = localStorage.getItem("selectedPreset");
+      if (presetData) {
+        // 프리셋 로드 중이면 이 useEffect는 건너뜀
+        return;
+      }
+
       const allDiseases = getAllDiseasesByCategory(ktasData, selectedCategory);
       const allFirstConsiderations = getFirstConsiderationsByCategory(
         ktasData,
@@ -95,15 +112,10 @@ export default function AdultInput() {
       setFirstConsiderations(allFirstConsiderations);
       setSecondConsiderations(allSecondConsiderations);
 
-      // 프리셋에서 로드된 경우가 아니면 선택 초기화
-      const presetData = localStorage.getItem("presetLoaded");
-      if (!presetData) {
-        setSelectedDiseases([]);
-        setSelectedFirstConsiderations([]);
-        setSelectedSecondConsiderations([]);
-      } else {
-        localStorage.removeItem("presetLoaded");
-      }
+      // 사용자가 카테고리를 변경한 경우 선택 초기화
+      setSelectedDiseases([]);
+      setSelectedFirstConsiderations([]);
+      setSelectedSecondConsiderations([]);
     }
   }, [selectedCategory, ktasData]);
 

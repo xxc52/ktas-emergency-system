@@ -5,6 +5,16 @@ export default function Timer() {
   const [elapsedTime, setElapsedTime] = useState('00:00');
 
   useEffect(() => {
+    // 새로운 세션이면 타이머 초기화
+    const sessionStarted = sessionStorage.getItem('timerSessionStarted');
+
+    if (!sessionStarted) {
+      // 새 세션: 타이머 초기화
+      const startTime = Date.now().toString();
+      localStorage.setItem('ktasTimer', startTime);
+      sessionStorage.setItem('timerSessionStarted', 'true');
+    }
+
     // localStorage에서 타이머 시작 시간 가져오기
     let startTime = localStorage.getItem('ktasTimer');
 
