@@ -113,12 +113,10 @@ export async function batchAddressToCoordinates(addressList, delay = 100) {
 export function refineAddressForGeocoding(address) {
   if (!address) return '';
 
-  // 병원명, 전화번호, 특수문자 제거
+  // 최소한의 정제만 수행 (VWorld API는 원본 주소를 선호)
   let refined = address
-    .replace(/병원|의원|클리닉|센터|의료원/g, '') // 의료기관 명칭 제거
-    .replace(/\([^)]*\)/g, '') // 괄호 내용 제거
-    .replace(/\d{2,3}-\d{3,4}-\d{4}/g, '') // 전화번호 제거
-    .replace(/[,;]/g, '') // 쉼표, 세미콜론 제거
+    .replace(/\d{2,3}-\d{3,4}-\d{4}/g, '') // 전화번호만 제거
+    .replace(/[,;]/g, ' ') // 쉼표, 세미콜론을 공백으로 변경
     .replace(/\s+/g, ' ') // 중복 공백 정리
     .trim();
 

@@ -179,9 +179,9 @@ export function filterAndScoreHospitals(
     let score = 1000; // 기본 점수
     let reasons = [];
 
-    // 1. 거리 패널티 (거리 × 10점 감점)
+    // 1. 거리 패널티 (거리 × 1점 감점)
     const distance = hospital.distance || 0;
-    const distancePenalty = Math.round(distance * 10);
+    const distancePenalty = Math.round(distance * 1);
     score -= distancePenalty;
     reasons.push(`거리 ${distance.toFixed(1)}km (-${distancePenalty})`);
 
@@ -202,12 +202,10 @@ export function filterAndScoreHospitals(
       if (usable <= 0) {
         score -= 100;
         reasons.push(`응급병상: 0/${total} (-100)`);
-      } else if (usable <= 2) {
-        score += usable * 5;
-        reasons.push(`응급병상: ${usable}/${total} (+${usable * 5})`);
       } else {
-        score += usable * 3;
-        reasons.push(`응급병상: ${usable}/${total} (+${usable * 3})`);
+        const bedScore = Math.round(usable * 0.5);
+        score += bedScore;
+        reasons.push(`응급병상: ${usable}/${total} (+${bedScore})`);
       }
     } else {
       // 응급실 병상 정보가 없으면 중간 정도 감점
@@ -228,14 +226,11 @@ export function filterAndScoreHospitals(
       if (level === "Y") {
         svdssScore += 10;
         svdssDetails.push(`${name}:Y`);
-      } else if (level === "N") {
-        svdssScore -= 30;
-        svdssDetails.push(`${name}:N`);
-      } else if (level === "N1") {
-        svdssScore -= 20;
-        svdssDetails.push(`${name}:N1`);
+      } else if (level === "N" || level === "N1") {
+        svdssScore -= 100;
+        svdssDetails.push(`${name}:${level}`);
       } else if (level === "NONE") {
-        svdssScore -= 10;
+        svdssScore -= 50;
         svdssDetails.push(`${name}:없음`);
       }
     });
@@ -251,8 +246,8 @@ export function filterAndScoreHospitals(
       );
     } else if (svdssRequested) {
       // 요청했는데 정보가 없으면 감점
-      score -= 10;
-      reasons.push(`중증: 정보없음 (-10)`);
+      score -= 50;
+      reasons.push(`중증: 정보없음 (-50)`);
     }
     // 요청하지 않았으면 감점하지 않음
 
@@ -269,14 +264,11 @@ export function filterAndScoreHospitals(
       if (level === "Y") {
         admissionScore += 5;
         admissionDetails.push(`${name}:Y`);
-      } else if (level === "N") {
-        admissionScore -= 25;
-        admissionDetails.push(`${name}:N`);
-      } else if (level === "N1") {
-        admissionScore -= 15;
-        admissionDetails.push(`${name}:N1`);
+      } else if (level === "N" || level === "N1") {
+        admissionScore -= 100;
+        admissionDetails.push(`${name}:${level}`);
       } else if (level === "NONE") {
-        admissionScore -= 10;
+        admissionScore -= 50;
         admissionDetails.push(`${name}:없음`);
       }
     });
@@ -292,8 +284,8 @@ export function filterAndScoreHospitals(
       );
     } else if (rltmCdRequested) {
       // 요청했는데 정보가 없으면 감점
-      score -= 5;
-      reasons.push(`입원: 정보없음 (-5)`);
+      score -= 50;
+      reasons.push(`입원: 정보없음 (-50)`);
     }
     // 요청하지 않았으면 감점하지 않음
 
@@ -310,14 +302,11 @@ export function filterAndScoreHospitals(
       if (level === "Y") {
         equipmentScore += 5;
         equipmentDetails.push(`${name}:Y`);
-      } else if (level === "N") {
-        equipmentScore -= 20;
-        equipmentDetails.push(`${name}:N`);
-      } else if (level === "N1") {
-        equipmentScore -= 10;
-        equipmentDetails.push(`${name}:N1`);
+      } else if (level === "N" || level === "N1") {
+        equipmentScore -= 40;
+        equipmentDetails.push(`${name}:${level}`);
       } else if (level === "NONE") {
-        equipmentScore -= 5;
+        equipmentScore -= 30;
         equipmentDetails.push(`${name}:없음`);
       }
     });
@@ -333,8 +322,8 @@ export function filterAndScoreHospitals(
       );
     } else if (rltmMeCdRequested) {
       // 요청했는데 정보가 없으면 감점
-      score -= 5;
-      reasons.push(`장비: 정보없음 (-5)`);
+      score -= 30;
+      reasons.push(`장비: 정보없음 (-30)`);
     }
     // 요청하지 않았으면 감점하지 않음
 

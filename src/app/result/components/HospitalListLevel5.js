@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { determineDepartmentCode, getRegionsForSearch } from '@/utils/llmService';
 import { searchAndSortHospitals, getHospitalStatus } from '@/utils/hospitalApi';
 
-export default function HospitalListLevel5({ currentLocation, patientData, onHospitalsUpdate }) {
+export default function HospitalListLevel5({ currentLocation, patientData, onHospitalsUpdate, onHospitalSelect }) {
   const [hospitals, setHospitals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -182,7 +182,12 @@ export default function HospitalListLevel5({ currentLocation, patientData, onHos
         </div>
       ) : (
         hospitals.map((hospital) => (
-          <div key={hospital.id} className="hospital-item">
+          <div
+            key={hospital.id}
+            className="hospital-item"
+            style={{ cursor: "pointer" }}
+            onClick={() => onHospitalSelect && onHospitalSelect(hospital.id)}
+          >
             <div className="hospital-header">
               <h3 className="hospital-name">
                 {hospital.name}

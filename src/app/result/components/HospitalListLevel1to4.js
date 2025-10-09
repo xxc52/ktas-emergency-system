@@ -94,86 +94,14 @@ export default function HospitalListLevel1to4({
   };
 
   // API 응답의 code로 병원에 메시지 페널티 추가 (중복 감점 방지)
+  // N/N1은 이미 elements에서 감점되므로 메시지 페널티 없음
   const addMessagePenaltiesToHospitals = (hospitals, patientFilters) => {
     return hospitals.map(hospital => {
-      let messagePenalty = 0;
-      let penaltyReasons = [];
-      const processedCodes = new Set(); // 중복 방지용
-
-      // 병원의 erMessages와 unavailableMessages 확인
-      const allMessages = [
-        ...(hospital.erMessages || []),
-        ...(hospital.unavailableMessages || []),
-      ];
-
-      for (const msg of allMessages) {
-        const code = msg.code;
-        if (!code || processedCodes.has(code)) continue;
-
-        // 기존 요소에서 이미 감점된 코드인지 확인
-        let alreadyPenalized = false;
-
-        // 입원병상 중복 체크
-        if (patientFilters.rltmCd && patientFilters.rltmCd.includes(code)) {
-          const existingElement = hospital.rltmCd?.elements?.[code];
-          if (existingElement && ['N', 'N1', 'NONE'].includes(existingElement.availableLevel)) {
-            alreadyPenalized = true;
-            console.log(`  ℹ️ ${hospital.name}: ${code} 이미 입원병상에서 감점됨, 메시지 페널티 제외`);
-          } else {
-            messagePenalty += 50;
-            penaltyReasons.push(`입원병상 메시지 (${filterCodeNames[code] || code})`);
-            processedCodes.add(code);
-          }
-        }
-
-        // 중증응급 중복 체크
-        if (!alreadyPenalized && patientFilters.svdssCd && patientFilters.svdssCd.includes(code)) {
-          const existingElement = hospital.svdssCd?.elements?.[code];
-          if (existingElement && ['N', 'N1', 'NONE'].includes(existingElement.availableLevel)) {
-            alreadyPenalized = true;
-            console.log(`  ℹ️ ${hospital.name}: ${code} 이미 중증응급에서 감점됨, 메시지 페널티 제외`);
-          } else {
-            messagePenalty += 40;
-            penaltyReasons.push(`중증응급 메시지 (${filterCodeNames[code] || code})`);
-            processedCodes.add(code);
-          }
-        }
-
-        // 응급실병상 중복 체크
-        if (!alreadyPenalized && patientFilters.rltmEmerCd && patientFilters.rltmEmerCd.includes(code)) {
-          const existingElement = hospital.rltmEmerCd?.elements?.[code];
-          if (existingElement && ['N', 'N1', 'NONE'].includes(existingElement.availableLevel)) {
-            alreadyPenalized = true;
-            console.log(`  ℹ️ ${hospital.name}: ${code} 이미 응급실병상에서 감점됨, 메시지 페널티 제외`);
-          } else {
-            messagePenalty += 80;
-            penaltyReasons.push(`응급실 메시지 (${filterCodeNames[code] || code})`);
-            processedCodes.add(code);
-          }
-        }
-
-        // 장비 중복 체크
-        if (!alreadyPenalized && patientFilters.rltmMeCd && patientFilters.rltmMeCd.includes(code)) {
-          const existingElement = hospital.rltmMeCd?.elements?.[code];
-          if (existingElement && ['N', 'N1', 'NONE'].includes(existingElement.availableLevel)) {
-            alreadyPenalized = true;
-            console.log(`  ℹ️ ${hospital.name}: ${code} 이미 장비에서 감점됨, 메시지 페널티 제외`);
-          } else {
-            messagePenalty += 30;
-            penaltyReasons.push(`장비 메시지 (${filterCodeNames[code] || code})`);
-            processedCodes.add(code);
-          }
-        }
-      }
-
-      if (messagePenalty > 0) {
-        console.log(`  ⚠️ ${hospital.name} 메시지 감점: -${messagePenalty}점 (${penaltyReasons.join(", ")})`);
-      }
-
+      // N/N1으로 감점되므로 메시지 페널티는 별도로 추가하지 않음
       return {
         ...hospital,
-        messagePenalty,
-        penaltyReasons
+        messagePenalty: 0,
+        penaltyReasons: []
       };
     });
   };

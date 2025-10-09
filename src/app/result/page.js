@@ -206,6 +206,7 @@ export default function Result() {
               currentLocation={currentLocation}
               patientData={result}
               onHospitalsUpdate={setHospitals}
+              onHospitalSelect={setSelectedHospitalId}
             />
           ) : (
             <HospitalListLevel1to4
