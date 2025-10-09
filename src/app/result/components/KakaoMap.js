@@ -40,48 +40,15 @@ export default function LeafletMap({
         shadowSize: [41, 41],
       });
 
-      // 병원 아이콘 (회색 - 일반 병원)
+      // 일반 병원 아이콘 (빨간색 - 눈에 띄게)
       const hospitalIcon = new L.Icon({
         iconUrl:
           "data:image/svg+xml;charset=utf-8," +
           encodeURIComponent(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">
-            <path d="M12.5 0C5.6 0 0 5.6 0 12.5c0 8.3 12.5 28.5 12.5 28.5s12.5-20.2 12.5-28.5C25 5.6 19.4 0 12.5 0z" fill="#6b7280"/>
-            <circle cx="12.5" cy="12.5" r="8" fill="white"/>
-            <path d="M12.5 6v13M6 12.5h13" stroke="#6b7280" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        `),
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-      });
-
-      // 상위 1위 아이콘 (금색 + 크라운)
-      const rank1Icon = new L.Icon({
-        iconUrl:
-          "data:image/svg+xml;charset=utf-8," +
-          encodeURIComponent(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="35" height="51" viewBox="0 0 35 51">
-            <path d="M17.5 5C10.6 5 5 10.6 5 17.5c0 8.3 12.5 28.5 12.5 28.5s12.5-20.2 12.5-28.5C30 10.6 24.4 5 17.5 5z" fill="#fbbf24"/>
-            <circle cx="17.5" cy="17.5" r="10" fill="white"/>
-            <text x="17.5" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#fbbf24">1</text>
-            <path d="M10 3 L13 8 L17.5 6 L22 8 L25 3 L22 6 L17.5 4 L13 6 Z" fill="#fbbf24"/>
-          </svg>
-        `),
-        iconSize: [35, 51],
-        iconAnchor: [17, 51],
-        popupAnchor: [1, -34],
-      });
-
-      // 상위 2위 아이콘 (은색)
-      const rank2Icon = new L.Icon({
-        iconUrl:
-          "data:image/svg+xml;charset=utf-8," +
-          encodeURIComponent(`
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="48" viewBox="0 0 32 48">
-            <path d="M16 3C9.1 3 3.5 8.6 3.5 15.5c0 8.3 12.5 28.5 12.5 28.5s12.5-20.2 12.5-28.5C28.5 8.6 22.9 3 16 3z" fill="#94a3b8"/>
-            <circle cx="16" cy="15.5" r="9" fill="white"/>
-            <text x="16" y="21" text-anchor="middle" font-size="13" font-weight="bold" fill="#94a3b8">2</text>
+            <path d="M16 0C9.1 0 3.5 5.6 3.5 12.5c0 8.3 12.5 31.5 12.5 31.5s12.5-23.2 12.5-31.5C28.5 5.6 22.9 0 16 0z" fill="#dc2626"/>
+            <circle cx="16" cy="12.5" r="9" fill="white"/>
+            <path d="M16 6v13M9.5 12.5h13" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
           </svg>
         `),
         iconSize: [32, 48],
@@ -89,20 +56,53 @@ export default function LeafletMap({
         popupAnchor: [1, -34],
       });
 
-      // 상위 3위 아이콘 (동색)
+      // 상위 1위 아이콘 (금색 + 크라운 + border)
+      const rank1Icon = new L.Icon({
+        iconUrl:
+          "data:image/svg+xml;charset=utf-8," +
+          encodeURIComponent(`
+          <svg xmlns="http://www.w3.org/2000/svg" width="44" height="64" viewBox="0 0 44 64">
+            <path d="M22 8C15.1 8 9.5 13.6 9.5 20.5c0 8.3 12.5 35.5 12.5 35.5s12.5-27.2 12.5-35.5C34.5 13.6 28.9 8 22 8z" fill="#fbbf24" stroke="#854d0e" stroke-width="2"/>
+            <circle cx="22" cy="20.5" r="11" fill="white" stroke="#854d0e" stroke-width="1.5"/>
+            <text x="22" y="27" text-anchor="middle" font-size="16" font-weight="bold" fill="#fbbf24">1</text>
+            <path d="M13 5 L17 11 L22 9 L27 11 L31 5 L27 9 L22 6 L17 9 Z" fill="#fbbf24" stroke="#854d0e" stroke-width="1"/>
+          </svg>
+        `),
+        iconSize: [44, 64],
+        iconAnchor: [22, 64],
+        popupAnchor: [1, -38],
+      });
+
+      // 상위 2위 아이콘 (은색 + border)
+      const rank2Icon = new L.Icon({
+        iconUrl:
+          "data:image/svg+xml;charset=utf-8," +
+          encodeURIComponent(`
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="58" viewBox="0 0 40 58">
+            <path d="M20 6C13.1 6 7.5 11.6 7.5 18.5c0 8.3 12.5 33.5 12.5 33.5s12.5-25.2 12.5-33.5C32.5 11.6 26.9 6 20 6z" fill="#94a3b8" stroke="#475569" stroke-width="2"/>
+            <circle cx="20" cy="18.5" r="10" fill="white" stroke="#475569" stroke-width="1.5"/>
+            <text x="20" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#94a3b8">2</text>
+          </svg>
+        `),
+        iconSize: [40, 58],
+        iconAnchor: [20, 58],
+        popupAnchor: [1, -36],
+      });
+
+      // 상위 3위 아이콘 (동색 + border)
       const rank3Icon = new L.Icon({
         iconUrl:
           "data:image/svg+xml;charset=utf-8," +
           encodeURIComponent(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="46" viewBox="0 0 30 46">
-            <path d="M15 2C8.1 2 2.5 7.6 2.5 14.5c0 8.3 12.5 28.5 12.5 28.5s12.5-20.2 12.5-28.5C27.5 7.6 21.9 2 15 2z" fill="#cd7f32"/>
-            <circle cx="15" cy="14.5" r="8.5" fill="white"/>
-            <text x="15" y="20" text-anchor="middle" font-size="12" font-weight="bold" fill="#cd7f32">3</text>
+          <svg xmlns="http://www.w3.org/2000/svg" width="38" height="56" viewBox="0 0 38 56">
+            <path d="M19 5C12.1 5 6.5 10.6 6.5 17.5c0 8.3 12.5 32.5 12.5 32.5s12.5-24.2 12.5-32.5C31.5 10.6 25.9 5 19 5z" fill="#cd7f32" stroke="#78350f" stroke-width="2"/>
+            <circle cx="19" cy="17.5" r="9.5" fill="white" stroke="#78350f" stroke-width="1.5"/>
+            <text x="19" y="24" text-anchor="middle" font-size="14" font-weight="bold" fill="#cd7f32">3</text>
           </svg>
         `),
-        iconSize: [30, 46],
-        iconAnchor: [15, 46],
-        popupAnchor: [1, -34],
+        iconSize: [38, 56],
+        iconAnchor: [19, 56],
+        popupAnchor: [1, -36],
       });
 
       setLeafletIcons({
@@ -332,8 +332,8 @@ export default function LeafletMap({
         className="leaflet-map"
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | &copy; <a href="https://carto.com/">CartoDB</a>'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
 
         {/* 지도 자동 조정 (현재 위치 + 상위 3개 병원) */}

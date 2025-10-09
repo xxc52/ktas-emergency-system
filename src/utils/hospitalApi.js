@@ -196,6 +196,93 @@ function normalizeHospitalData(hospital) {
 }
 
 /**
+ * 병원명으로 병원 정보 검색 (연락처 조회용)
+ * @param {string} hospitalName - 병원명
+ * @returns {Promise<Object|null>} 병원 정보 (연락처 포함) 또는 null
+ */
+export async function searchHospitalByName(hospitalName) {
+  try {
+    console.log(`🔍 병원명 검색: "${hospitalName}"`);
+
+    const params = new URLSearchParams({
+      ServiceKey: HOSPITAL_API_CONFIG.SERVICE_KEY,
+      QN: hospitalName,
+      pageNo: 1,
+      numOfRows: 10,
+      _type: 'json'
+    });
+
+    const url = `${HOSPITAL_API_CONFIG.BASE_URL}?${params.toString()}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      signal: AbortSignal.timeout(HOSPITAL_API_CONFIG.TIMEOUT),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    // API 응답에서 첫 번째 병원 정보 추출
+    let hospital = null;
+    if (data.response && data.response.body && data.response.body.items) {
+      if (data.response.body.items.item) {
+        const items = Array.isArray(data.response.body.items.item)
+          ? data.response.body.items.item
+          : [data.response.body.items.item];
+        hospital = items[0];
+      }
+    }
+
+    if (hospital) {
+      console.log(`✅ 연락처 조회 성공: ${hospital.dutyTel1} / ${hospital.dutyTel3}`);
+      return {
+        phone: hospital.dutyTel1 || '',
+        emergencyPhone: hospital.dutyTel3 || '',
+      };
+    } else {
+      console.warn(`⚠️ 병원명 검색 결과 없음: ${hospitalName}`);
+      return null;
+    }
+  } catch (error) {
+    console.error(`❌ 병원명 검색 실패 (${hospitalName}):`, error.message);
+    return null;
+  }
+}
+
+/**
+ * 여러 병원의 연락처를 일괄 조회
+ * @param {Array<{name: string, id: string}>} hospitals - 병원 목록
+ * @returns {Promise<Map>} 병원 ID를 키로 하는 연락처 정보 맵
+ */
+export async function fetchHospitalContacts(hospitals) {
+  console.log(`📞 ${hospitals.length}개 병원 연락처 조회 시작`);
+
+  const contactPromises = hospitals.map(async (hospital) => {
+    const contact = await searchHospitalByName(hospital.name);
+    return { id: hospital.id, contact };
+  });
+
+  const results = await Promise.all(contactPromises);
+
+  // Map으로 변환
+  const contactMap = new Map();
+  results.forEach(({ id, contact }) => {
+    if (contact) {
+      contactMap.set(id, contact);
+    }
+  });
+
+  console.log(`✅ 연락처 조회 완료: ${contactMap.size}/${hospitals.length}개 성공`);
+  return contactMap;
+}
+
+/**
  * 여러 지역에서 병원 검색 후 거리순 정렬
  * @param {Array<string>} regions - 검색할 지역 목록
  * @param {string} departmentCode - 진료과목 코드

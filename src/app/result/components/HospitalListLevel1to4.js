@@ -5,6 +5,7 @@ import {
   progressiveSearch,
   filterAndScoreHospitals,
 } from "@/utils/emergencyHospitalApi";
+import { fetchHospitalContacts } from "@/utils/hospitalApi";
 
 export default function HospitalListLevel1to4({
   currentLocation,
@@ -236,15 +237,53 @@ export default function HospitalListLevel1to4({
         scoreReasons: hospital.scoreReasons,
       }));
 
-      setHospitals(formattedHospitals);
+      // 6단계: 연락처 정보 조회 (병렬 처리)
+      addProgress("📞 병원 연락처 조회 중...", "info");
 
-      // 부모 컴포넌트(지도)에 병원 데이터 전달
-      if (onHospitalsUpdate) {
-        onHospitalsUpdate(formattedHospitals);
+      try {
+        const hospitalList = formattedHospitals.map(h => ({
+          name: h.name,
+          id: h.id
+        }));
+
+        const contactMap = await fetchHospitalContacts(hospitalList);
+
+        // 연락처 정보 병합
+        const hospitalsWithContacts = formattedHospitals.map(hospital => {
+          const contact = contactMap.get(hospital.id);
+          if (contact) {
+            return {
+              ...hospital,
+              phone: contact.phone || hospital.phone,
+              emergencyPhone: contact.emergencyPhone || hospital.emergencyPhone
+            };
+          }
+          return hospital;
+        });
+
+        setHospitals(hospitalsWithContacts);
+
+        // 부모 컴포넌트(지도)에 병원 데이터 전달
+        if (onHospitalsUpdate) {
+          onHospitalsUpdate(hospitalsWithContacts);
+        }
+
+        const successCount = contactMap.size;
+        addProgress(`✅ 연락처 조회 완료 (${successCount}/${formattedHospitals.length})`, "success");
+
+        console.log("\n✅ 응급실 검색 완료");
+        console.log(`📊 총 ${hospitalsWithContacts.length}개 병원 표시`);
+        console.log(`📞 연락처 조회 성공: ${successCount}개\n`);
+      } catch (contactError) {
+        console.error("연락처 조회 실패:", contactError);
+        addProgress("⚠️ 연락처 조회 실패 (기본 정보만 표시)", "warning");
+
+        // 연락처 조회 실패 시 기본 데이터만 표시
+        setHospitals(formattedHospitals);
+        if (onHospitalsUpdate) {
+          onHospitalsUpdate(formattedHospitals);
+        }
       }
-
-      console.log("\n✅ 응급실 검색 완료");
-      console.log(`📊 총 ${formattedHospitals.length}개 병원 표시\n`);
     } catch (error) {
       console.error("\n❌ 응급실 검색 실패:", error);
       setError(error.message);
@@ -679,11 +718,20 @@ export default function HospitalListLevel1to4({
 
               {/* 연락처와 주소 정보 */}
               <div className="hospital-row" style={{ marginTop: "8px" }}>
-                <span className="detail-label">연락처:</span>
+                <span className="detail-label">대표전화:</span>
                 <span className="detail-value">
-                  {hospital.phone || "정보 없음"}
+                  {hospital.phone || "조회 중..."}
                 </span>
               </div>
+
+              {hospital.emergencyPhone && (
+                <div className="hospital-row">
+                  <span className="detail-label">응급실:</span>
+                  <span className="detail-value" style={{ color: "#ef4444", fontWeight: "600" }}>
+                    {hospital.emergencyPhone}
+                  </span>
+                </div>
+              )}
 
               <div className="hospital-row">
                 <span className="detail-label">주소:</span>
