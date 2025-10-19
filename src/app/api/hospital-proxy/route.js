@@ -1,14 +1,31 @@
 import { NextResponse } from 'next/server';
 
-// API 설정
-const HOSPITAL_API_CONFIG = {
-  BASE_URL: 'http://apis.data.go.kr/B552657/HsptlAsembySearchService/getHsptlMdcncListInfoInqire',
-  SERVICE_KEY: '4d3689cde20aee7c9a462d2fe3a3bf435084a21af9e13b71c30d6ecb21168c0f',
-  DEFAULT_NUM_OF_ROWS: 1000,
-  TIMEOUT: 15000,
-};
+/**
+ * ⚠️ 임시 비활성화: 공공데이터포털 운영 중단으로 인한 에러 방지
+ * 공공데이터포털(apis.data.go.kr) 임시 운영 중단 상태
+ */
+
+// API 설정 (임시 비활성화)
+// const HOSPITAL_API_CONFIG = {
+//   BASE_URL: 'http://apis.data.go.kr/B552657/HsptlAsembySearchService/getHsptlMdcncListInfoInqire',
+//   SERVICE_KEY: '4d3689cde20aee7c9a462d2fe3a3bf435084a21af9e13b71c30d6ecb21168c0f',
+//   DEFAULT_NUM_OF_ROWS: 1000,
+//   TIMEOUT: 15000,
+// };
 
 export async function GET(request) {
+  // 공공데이터포털 API 임시 중단으로 인한 비활성화
+  console.warn('⚠️ 공공데이터포털 API 임시 중단 - 프록시 기능 비활성화');
+  return NextResponse.json(
+    {
+      error: '공공데이터포털 임시 운영 중단',
+      message: '병원 검색 API가 일시적으로 사용 불가능합니다.',
+      response: { body: { items: [] } } // 빈 응답 반환
+    },
+    { status: 503 } // Service Unavailable
+  );
+
+  /* 공공데이터포털 API 임시 주석 처리 (운영 중단)
   try {
     const { searchParams } = new URL(request.url);
     const region = searchParams.get('region');
@@ -73,6 +90,7 @@ export async function GET(request) {
       { status: 500 }
     );
   }
+  */
 }
 
 // OPTIONS 요청 처리 (CORS preflight)

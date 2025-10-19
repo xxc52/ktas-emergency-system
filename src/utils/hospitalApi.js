@@ -3,13 +3,15 @@
  * 진료과목별 병원 검색 및 데이터 처리
  */
 
-import { calculateDistance } from './llmService';
+import { calculateDistance } from "./llmService";
 
 // API 설정
 const HOSPITAL_API_CONFIG = {
-  BASE_URL: 'http://apis.data.go.kr/B552657/HsptlAsembySearchService/getHsptlMdcncListInfoInqire',
-  PROXY_URL: '/api/hospital-proxy', // Vercel 프록시 API
-  SERVICE_KEY: '4d3689cde20aee7c9a462d2fe3a3bf435084a21af9e13b71c30d6ecb21168c0f',
+  BASE_URL:
+    "http://apis.data.go.kr/B552657/HsptlAsembySearchService/getHsptlMdcncListInfoInqire",
+  PROXY_URL: "/api/hospital-proxy", // Vercel 프록시 API
+  SERVICE_KEY:
+    "4d3689cde20aee7c9a462d2fe3a3bf435084a21af9e13b71c30d6ecb21168c0f",
   DEFAULT_NUM_OF_ROWS: 1000, // 최대 검색 건수
   TIMEOUT: 15000, // 15초 타임아웃
 };
@@ -19,8 +21,14 @@ const HOSPITAL_API_CONFIG = {
  * @param {string} region - 시도명 (예: '서울특별시')
  * @param {string} departmentCode - 진료과목 코드 (예: 'D001')
  * @returns {Promise<Array>} 병원 목록
+ *
+ * ⚠️ 임시 비활성화: 공공데이터포털 운영 중단으로 인한 에러 방지
  */
 export async function searchHospitalsByDepartment(region, departmentCode) {
+  console.warn("⚠️ 공공데이터포털 API 임시 중단 - 병원 검색 기능 비활성화");
+  return []; // 임시로 빈 배열 반환
+
+  /* 공공데이터포털 API 임시 주석 처리 (운영 중단)
   try {
     console.log(`병원 검색 요청: ${region}, ${departmentCode}`);
 
@@ -109,6 +117,7 @@ export async function searchHospitalsByDepartment(region, departmentCode) {
     console.error(`병원 검색 실패 (${region}, ${departmentCode}):`, error);
     return []; // 실패 시 빈 배열 반환
   }
+  */
 }
 
 /**
@@ -117,81 +126,81 @@ export async function searchHospitalsByDepartment(region, departmentCode) {
  * @returns {Object} 정규화된 병원 데이터
  */
 function normalizeHospitalData(hospital) {
-  console.log('정규화할 병원 데이터:', hospital);
+  console.log("정규화할 병원 데이터:", hospital);
 
   const normalized = {
     // 기본 정보
     id: hospital.hpid || hospital.dutyName,
-    name: hospital.dutyName || '병원명 미상',
-    address: hospital.dutyAddr || '',
+    name: hospital.dutyName || "병원명 미상",
+    address: hospital.dutyAddr || "",
 
     // 연락처
-    phone: hospital.dutyTel1 || '',
-    emergencyPhone: hospital.dutyTel3 || '',
+    phone: hospital.dutyTel1 || "",
+    emergencyPhone: hospital.dutyTel3 || "",
 
     // 위치 정보
     latitude: parseFloat(hospital.wgs84Lat) || null,
     longitude: parseFloat(hospital.wgs84Lon) || null,
 
     // 병원 분류
-    division: hospital.dutyDiv || '',
-    divisionName: hospital.dutyDivNam || '',
+    division: hospital.dutyDiv || "",
+    divisionName: hospital.dutyDivNam || "",
 
     // 응급실 정보
-    hasEmergencyRoom: hospital.dutyEryn === '1',
-    emergencyCode: hospital.dutyEmcls || '',
-    emergencyCodeName: hospital.dutyEmclsName || '',
+    hasEmergencyRoom: hospital.dutyEryn === "1",
+    emergencyCode: hospital.dutyEmcls || "",
+    emergencyCodeName: hospital.dutyEmclsName || "",
 
     // 진료시간 (요일별)
     operatingHours: {
       monday: {
-        start: hospital.dutyTime1s || '',
-        end: hospital.dutyTime1c || ''
+        start: hospital.dutyTime1s || "",
+        end: hospital.dutyTime1c || "",
       },
       tuesday: {
-        start: hospital.dutyTime2s || '',
-        end: hospital.dutyTime2c || ''
+        start: hospital.dutyTime2s || "",
+        end: hospital.dutyTime2c || "",
       },
       wednesday: {
-        start: hospital.dutyTime3s || '',
-        end: hospital.dutyTime3c || ''
+        start: hospital.dutyTime3s || "",
+        end: hospital.dutyTime3c || "",
       },
       thursday: {
-        start: hospital.dutyTime4s || '',
-        end: hospital.dutyTime4c || ''
+        start: hospital.dutyTime4s || "",
+        end: hospital.dutyTime4c || "",
       },
       friday: {
-        start: hospital.dutyTime5s || '',
-        end: hospital.dutyTime5c || ''
+        start: hospital.dutyTime5s || "",
+        end: hospital.dutyTime5c || "",
       },
       saturday: {
-        start: hospital.dutyTime6s || '',
-        end: hospital.dutyTime6c || ''
+        start: hospital.dutyTime6s || "",
+        end: hospital.dutyTime6c || "",
       },
       sunday: {
-        start: hospital.dutyTime7s || '',
-        end: hospital.dutyTime7c || ''
+        start: hospital.dutyTime7s || "",
+        end: hospital.dutyTime7c || "",
       },
       holiday: {
-        start: hospital.dutyTime8s || '',
-        end: hospital.dutyTime8c || ''
-      }
+        start: hospital.dutyTime8s || "",
+        end: hospital.dutyTime8c || "",
+      },
     },
 
     // 기타 정보
-    description: hospital.dutyInf || '',
-    notes: hospital.dutyEtc || '',
-    mapImage: hospital.dutyMapimg || '',
+    description: hospital.dutyInf || "",
+    notes: hospital.dutyEtc || "",
+    mapImage: hospital.dutyMapimg || "",
 
     // 우편번호
-    zipCode: `${hospital.postCdn1 || ''}${hospital.postCdn2 || ''}`.trim(),
+    zipCode: `${hospital.postCdn1 || ""}${hospital.postCdn2 || ""}`.trim(),
 
     // 메타데이터
-    dataSource: 'national_medical_center',
-    lastUpdated: new Date().toISOString()
+    dataSource: "national_medical_center",
+    lastUpdated: new Date().toISOString(),
   };
 
-  console.log('정규화 결과:', normalized);
+  console.log("정규화 결과:", normalized);
   return normalized;
 }
 
@@ -199,8 +208,14 @@ function normalizeHospitalData(hospital) {
  * 병원명으로 병원 정보 검색 (연락처 조회용)
  * @param {string} hospitalName - 병원명
  * @returns {Promise<Object|null>} 병원 정보 (연락처 포함) 또는 null
+ *
+ * ⚠️ 임시 비활성화: 공공데이터포털 운영 중단으로 인한 에러 방지
  */
 export async function searchHospitalByName(hospitalName) {
+  console.warn("⚠️ 공공데이터포털 API 임시 중단 - 연락처 조회 기능 비활성화");
+  return null; // 임시로 null 반환
+
+  /* 공공데이터포털 API 임시 주석 처리 (운영 중단)
   try {
     console.log(`🔍 병원명 검색: "${hospitalName}"`);
 
@@ -253,6 +268,7 @@ export async function searchHospitalByName(hospitalName) {
     console.error(`❌ 병원명 검색 실패 (${hospitalName}):`, error.message);
     return null;
   }
+  */
 }
 
 /**
@@ -278,7 +294,9 @@ export async function fetchHospitalContacts(hospitals) {
     }
   });
 
-  console.log(`✅ 연락처 조회 완료: ${contactMap.size}/${hospitals.length}개 성공`);
+  console.log(
+    `✅ 연락처 조회 완료: ${contactMap.size}/${hospitals.length}개 성공`
+  );
   return contactMap;
 }
 
@@ -290,12 +308,22 @@ export async function fetchHospitalContacts(hospitals) {
  * @param {number} limit - 반환할 병원 수 (기본값: 20)
  * @returns {Promise<Array>} 거리순으로 정렬된 병원 목록
  */
-export async function searchAndSortHospitals(regions, departmentCode, currentLocation, limit = 20) {
+export async function searchAndSortHospitals(
+  regions,
+  departmentCode,
+  currentLocation,
+  limit = 20
+) {
   try {
-    console.log('병원 통합 검색 시작:', { regions, departmentCode, currentLocation, limit });
+    console.log("병원 통합 검색 시작:", {
+      regions,
+      departmentCode,
+      currentLocation,
+      limit,
+    });
 
     // 모든 지역에서 병원 검색 (병렬 처리)
-    const searchPromises = regions.map(region =>
+    const searchPromises = regions.map((region) =>
       searchHospitalsByDepartment(region, departmentCode)
     );
 
@@ -305,7 +333,7 @@ export async function searchAndSortHospitals(regions, departmentCode, currentLoc
     let allHospitals = [];
     results.forEach((hospitals, index) => {
       const region = regions[index];
-      hospitals.forEach(hospital => {
+      hospitals.forEach((hospital) => {
         hospital.searchRegion = region; // 검색 지역 정보 추가
         allHospitals.push(hospital);
       });
@@ -314,9 +342,12 @@ export async function searchAndSortHospitals(regions, departmentCode, currentLoc
     console.log(`총 검색된 병원 수: ${allHospitals.length}`);
 
     // 유효한 위치 정보가 있는 병원만 필터링
-    const validHospitals = allHospitals.filter(hospital =>
-      hospital.latitude && hospital.longitude &&
-      !isNaN(hospital.latitude) && !isNaN(hospital.longitude)
+    const validHospitals = allHospitals.filter(
+      (hospital) =>
+        hospital.latitude &&
+        hospital.longitude &&
+        !isNaN(hospital.latitude) &&
+        !isNaN(hospital.longitude)
     );
 
     console.log(`위치 정보가 유효한 병원 수: ${validHospitals.length}`);
@@ -327,7 +358,7 @@ export async function searchAndSortHospitals(regions, departmentCode, currentLoc
     }
 
     // 거리 계산 및 정렬
-    const hospitalsWithDistance = validHospitals.map(hospital => {
+    const hospitalsWithDistance = validHospitals.map((hospital) => {
       const distance = calculateDistance(
         currentLocation.lat,
         currentLocation.lng,
@@ -338,7 +369,7 @@ export async function searchAndSortHospitals(regions, departmentCode, currentLoc
       return {
         ...hospital,
         distance: distance,
-        distanceText: formatDistance(distance)
+        distanceText: formatDistance(distance),
       };
     });
 
@@ -348,9 +379,8 @@ export async function searchAndSortHospitals(regions, departmentCode, currentLoc
     console.log(`거리순 정렬 완료, 상위 ${limit}개 반환`);
 
     return hospitalsWithDistance.slice(0, limit);
-
   } catch (error) {
-    console.error('병원 통합 검색 실패:', error);
+    console.error("병원 통합 검색 실패:", error);
     return [];
   }
 }
@@ -379,10 +409,19 @@ function formatDistance(distance) {
 export function getHospitalStatus(hospital, currentTime = new Date()) {
   const now = currentTime;
   const dayOfWeek = now.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
-  const currentTimeStr = now.getHours().toString().padStart(2, '0') +
-                        now.getMinutes().toString().padStart(2, '0');
+  const currentTimeStr =
+    now.getHours().toString().padStart(2, "0") +
+    now.getMinutes().toString().padStart(2, "0");
 
-  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const dayNames = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+  ];
   const todaySchedule = hospital.operatingHours[dayNames[dayOfWeek]];
 
   let isOpen = false;
@@ -390,12 +429,16 @@ export function getHospitalStatus(hospital, currentTime = new Date()) {
 
   if (todaySchedule && todaySchedule.start && todaySchedule.end) {
     // Ensure start and end are strings and properly formatted
-    const startTimeStr = String(todaySchedule.start || '').replace(/:/g, '');
-    const endTimeStr = String(todaySchedule.end || '').replace(/:/g, '');
+    const startTimeStr = String(todaySchedule.start || "").replace(/:/g, "");
+    const endTimeStr = String(todaySchedule.end || "").replace(/:/g, "");
 
     // Only calculate if we have valid time strings (4 digits)
-    if (startTimeStr.length === 4 && endTimeStr.length === 4 &&
-        /^\d{4}$/.test(startTimeStr) && /^\d{4}$/.test(endTimeStr)) {
+    if (
+      startTimeStr.length === 4 &&
+      endTimeStr.length === 4 &&
+      /^\d{4}$/.test(startTimeStr) &&
+      /^\d{4}$/.test(endTimeStr)
+    ) {
       isOpen = currentTimeStr >= startTimeStr && currentTimeStr <= endTimeStr;
     }
   }
@@ -404,7 +447,7 @@ export function getHospitalStatus(hospital, currentTime = new Date()) {
     isOpen,
     todaySchedule,
     nextOpenTime,
-    status: isOpen ? '진료중' : '진료종료'
+    status: isOpen ? "진료중" : "진료종료",
   };
 }
 
@@ -412,7 +455,7 @@ const hospitalApi = {
   searchHospitalsByDepartment,
   searchAndSortHospitals,
   getHospitalStatus,
-  formatDistance: formatDistance
+  formatDistance: formatDistance,
 };
 
 export default hospitalApi;
