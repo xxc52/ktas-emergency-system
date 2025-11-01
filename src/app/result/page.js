@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { savePatientAssessment } from "../../utils/patientRecordsSupabase";
@@ -40,6 +40,7 @@ export default function Result() {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [hospitals, setHospitals] = useState([]);
   const [selectedHospitalId, setSelectedHospitalId] = useState(null);
+  const saveAttemptedRef = useRef(false); // 중복 저장 방지
 
   useEffect(() => {
     const savedResult = localStorage.getItem("ktasResult");
@@ -85,15 +86,26 @@ export default function Result() {
         return;
       }
 
+      // useRef로 중복 저장 방지 (더 강력한 체크)
+      if (saveAttemptedRef.current) {
+        console.log("이미 저장 시도된 기록입니다. (useRef 체크)");
+        return;
+      }
+
       // 이미 저장되었는지 확인 (중복 저장 방지)
       const alreadySaved = localStorage.getItem("recordSaved");
       if (alreadySaved) {
-        console.log("이미 저장된 기록입니다.");
+        console.log("이미 저장된 기록입니다. (localStorage 체크)");
         setRecordSaved(true);
         return;
       }
 
+      // 저장 시도 플래그 설정 (React StrictMode 등으로 인한 중복 실행 방지)
+      saveAttemptedRef.current = true;
+
       const patientType = localStorage.getItem("selectedAge") || "adult";
+      const gender = localStorage.getItem("selectedGender") || null;
+      const ageGroup = localStorage.getItem("selectedDetailedAge") || null;
 
       // assessment_data 구조화
       const assessmentData = {
@@ -112,6 +124,8 @@ export default function Result() {
         rescuerId: finalRescuerId,
         patientType,
         ktasLevel: resultData.ktasLevel,
+        gender,
+        ageGroup,
       });
 
       const saved = await savePatientAssessment(
@@ -119,7 +133,9 @@ export default function Result() {
         patientType,
         assessmentData,
         resultData.ktasLevel,
-        null // hospital - 나중에 추가 가능
+        null, // hospital - 나중에 추가 가능
+        gender,
+        ageGroup
       );
 
       if (saved) {
@@ -140,6 +156,8 @@ export default function Result() {
     localStorage.removeItem("selectedWorker");
     localStorage.removeItem("selectedRescuerId");
     localStorage.removeItem("selectedAge");
+    localStorage.removeItem("selectedGender");
+    localStorage.removeItem("selectedDetailedAge");
     localStorage.removeItem("ktasResult");
     localStorage.removeItem("recordSaved");
     localStorage.removeItem("ktasTimer");

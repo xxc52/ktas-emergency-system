@@ -57,7 +57,6 @@ export default function ProfileSelection() {
     router.push("/records");
   };
 
-
   return (
     <div className="container">
       <div className="header">
@@ -68,7 +67,11 @@ export default function ProfileSelection() {
 
       <div className="content">
         <div
-          style={{ textAlign: "center", marginBottom: "var(--spacing-2xl)" }}
+          style={{
+            textAlign: "center",
+            marginTop: "var(--spacing-xl)",
+            marginBottom: "var(--spacing-xl)",
+          }}
         >
           <h2
             style={{
@@ -346,7 +349,6 @@ export default function ProfileSelection() {
           📊 기록 보기
         </button>
       </div>
-
     </div>
   );
 }

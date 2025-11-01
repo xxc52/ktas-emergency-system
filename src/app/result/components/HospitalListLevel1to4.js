@@ -134,6 +134,8 @@ export default function HospitalListLevel1to4({
         primaryDisease: patientData.primaryDisease || patientData.disease || "",
         firstConsiderations: patientData.firstConsiderations || [],
         secondConsiderations: patientData.secondConsiderations || [],
+        gender: patientData.gender || null,
+        ageGroup: patientData.ageGroup || null
       });
 
       setLlmStatus(filterResult);

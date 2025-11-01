@@ -298,6 +298,55 @@ Uses React's built-in state management with performance optimizations:
    - **병원 필터링**: <0.1초 (API code 직접 매칭)
    - **전체 검색 시간**: ~50초 (LLM 판단 포함)
 
+### ✅ Completed (Current Session - 2025-11-01):
+
+1. **환자 인구통계 정보 (Gender & Age Group) 통합**
+
+   - **문제**: 성별, 세부 연령대 정보가 DB에 저장되지 않고, LLM API 호출 시에도 전달되지 않음
+   - **해결**:
+     - Supabase `patient_assessments` 테이블에 `gender`, `age_group` 컬럼 추가 (SQL migration)
+     - DB 저장 로직에 gender, age_group 파라미터 추가
+     - LLM API 호출 시 환자 정보에 gender, age_group 포함
+     - FastAPI 백엔드에서 gender, age_group을 LLM 프롬프트에 반영
+
+2. **중복 삽입 버그 수정**
+
+   - **문제**: `patient_assessments` 테이블에 데이터가 2개씩 중복 삽입되는 고질적 버그
+   - **원인**: React StrictMode 등으로 인한 useEffect 중복 실행
+   - **해결**: useRef를 사용한 중복 저장 방지 로직 추가 (localStorage + useRef 2중 체크)
+
+3. **프리셋 기능 버그 수정**
+
+   - **문제**: age-selection 페이지의 "빠른 선택" 프리셋 버튼이 작동하지 않음
+   - **원인**: localStorage.removeItem 후 두 번째 useEffect에서 선택 사항 초기화
+   - **해결**: useRef 플래그를 사용하여 프리셋 로드 중 선택 초기화 건너뛰기
+
+4. **Files Modified:**
+
+   - **Database**:
+     - `database/add-patient-demographics.sql` - gender, age_group 컬럼 추가 및 인덱스 생성
+
+   - **Frontend (Patient Data Flow)**:
+     - `src/app/adult-input/page.js` - ktasResult에 gender, ageGroup 포함 + 프리셋 버그 수정
+     - `src/app/result/page.js` - savePatientAssessment에 gender, ageGroup 전달 + 중복 삽입 버그 수정
+     - `src/utils/patientRecordsSupabase.js` - savePatientAssessment 함수에 gender, ageGroup 파라미터 추가
+
+   - **Frontend (LLM Integration)**:
+     - `src/utils/llmService.js` - determineDepartmentCode, determineEmergencyFilters에 gender, ageGroup 추가
+     - `src/app/result/components/HospitalListLevel5.js` - LLM 호출 시 gender, ageGroup 전달
+     - `src/app/result/components/HospitalListLevel1to4.js` - LLM 호출 시 gender, ageGroup 전달
+
+   - **Backend (FastAPI)**:
+     - `llm/medical_rag_api.py` - DepartmentRequest, EmergencyFiltersRequest 모델에 gender, age_group 추가
+     - `/department` 엔드포인트: LLM 프롬프트에 성별/연령대 정보 포함
+     - `/emergency-filters` 엔드포인트: RAG 검색 및 LLM 프롬프트에 성별/연령대 정보 포함
+
+5. **검증된 개선사항:**
+   - ✅ DB에 gender='male', age_group='25-34' 정상 저장
+   - ✅ LLM API 로그에 "성별: male", "세부 연령대: 25-34" 출력 확인
+   - ✅ patient_assessments 테이블 단일 레코드 삽입 (중복 제거)
+   - ✅ 프리셋 버튼 클릭 시 모든 선택 사항 정상 로드
+
 ### 🎯 Next Steps (Immediate):
 
 **1. 병원 스코어링 및 거리 반경 수정**

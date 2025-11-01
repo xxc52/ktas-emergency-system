@@ -5,7 +5,7 @@ import { createClient } from './supabase/client';
 const supabase = createClient();
 
 // 환자 평가 기록 저장
-export async function savePatientAssessment(rescuerId, patientType, assessmentData, finalLevel, hospital = null) {
+export async function savePatientAssessment(rescuerId, patientType, assessmentData, finalLevel, hospital = null, gender = null, ageGroup = null) {
   try {
     const { data, error } = await supabase
       .from('patient_assessments')
@@ -14,7 +14,9 @@ export async function savePatientAssessment(rescuerId, patientType, assessmentDa
         patient_type: patientType,
         assessment_data: assessmentData,
         final_level: finalLevel,
-        hospital: hospital
+        hospital: hospital,
+        gender: gender,
+        age_group: ageGroup
       }])
       .select()
       .single();

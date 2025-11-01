@@ -46,6 +46,8 @@ export async function checkLLMHealth() {
  * @param {Array<string>} patientData.firstConsiderations - 1차 고려사항
  * @param {Array<string>} patientData.secondConsiderations - 2차 고려사항
  * @param {string} patientData.location - 현재 위치
+ * @param {string} patientData.gender - 성별 (male/female)
+ * @param {string} patientData.ageGroup - 세부 연령대 (15-24, 25-34, 35-44, 45-54, 55-64, 65+)
  * @returns {Promise<Object>} 진료과목 판단 결과
  */
 export async function determineDepartmentCode(patientData) {
@@ -58,6 +60,8 @@ export async function determineDepartmentCode(patientData) {
       first_considerations: patientData.firstConsiderations || [],
       second_considerations: patientData.secondConsiderations || [],
       location: patientData.location || "",
+      gender: patientData.gender || null,
+      age_group: patientData.ageGroup || null,
     };
 
     const response = await fetch(
@@ -171,6 +175,8 @@ export function calculateDistance(lat1, lng1, lat2, lng2) {
  * @param {string} patientData.primaryDisease - 주요 병명
  * @param {Array<string>} patientData.firstConsiderations - 1차 고려사항
  * @param {Array<string>} patientData.secondConsiderations - 2차 고려사항
+ * @param {string} patientData.gender - 성별 (male/female)
+ * @param {string} patientData.ageGroup - 세부 연령대 (15-24, 25-34, 35-44, 45-54, 55-64, 65+)
  * @returns {Promise<Object>} 필터 판단 결과
  */
 export async function determineEmergencyFilters(patientData) {
@@ -182,6 +188,8 @@ export async function determineEmergencyFilters(patientData) {
       primary_disease: patientData.primaryDisease || "",
       first_considerations: patientData.firstConsiderations || [],
       second_considerations: patientData.secondConsiderations || [],
+      gender: patientData.gender || null,
+      age_group: patientData.ageGroup || null,
     };
 
     const response = await fetch(

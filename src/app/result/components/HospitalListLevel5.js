@@ -32,7 +32,9 @@ export default function HospitalListLevel5({ currentLocation, patientData, onHos
         primaryDisease: patientData.primaryDisease || patientData.disease || '',
         firstConsiderations: patientData.firstConsiderations || [],
         secondConsiderations: patientData.secondConsiderations || [],
-        location: getCurrentLocationString()
+        location: getCurrentLocationString(),
+        gender: patientData.gender || null,
+        ageGroup: patientData.ageGroup || null
       });
 
       setLlmStatus(departmentResult);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   loadKtasData,
@@ -20,6 +20,7 @@ export default function AdultInput() {
   const [selectedWorker, setSelectedWorker] = useState(null);
   const [ktasData, setKtasData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isLoadingPresetRef = useRef(false); // 프리셋 로드 중 플래그
 
   // Selection states
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -46,6 +47,7 @@ export default function AdultInput() {
     if (presetData) {
       const preset = JSON.parse(presetData);
       localStorage.removeItem("selectedPreset"); // 한 번만 사용하고 삭제
+      isLoadingPresetRef.current = true; // 프리셋 로드 시작
 
       // 데이터 로드 후 프리셋 적용
       loadKtasData().then((data) => {
@@ -78,6 +80,10 @@ export default function AdultInput() {
         }
 
         setLoading(false);
+        // 프리셋 로드 완료 (다음 렌더 사이클에서 플래그 해제)
+        setTimeout(() => {
+          isLoadingPresetRef.current = false;
+        }, 100);
       });
     } else {
       loadKtasData().then((data) => {
@@ -91,10 +97,9 @@ export default function AdultInput() {
   // Update available options when category changes (프리셋 로드 후에는 실행되지 않음)
   useEffect(() => {
     if (selectedCategory && ktasData.length > 0) {
-      // 프리셋이 로드 중인지 확인 (초기 마운트 시에만 체크)
-      const presetData = localStorage.getItem("selectedPreset");
-      if (presetData) {
-        // 프리셋 로드 중이면 이 useEffect는 건너뜀
+      // 프리셋 로드 중이면 이 useEffect는 건너뜀 (useRef 사용)
+      if (isLoadingPresetRef.current) {
+        console.log('프리셋 로드 중이므로 선택 초기화 건너뜀');
         return;
       }
 
@@ -113,6 +118,7 @@ export default function AdultInput() {
       setSecondConsiderations(allSecondConsiderations);
 
       // 사용자가 카테고리를 변경한 경우 선택 초기화
+      console.log('카테고리 변경으로 선택 초기화');
       setSelectedDiseases([]);
       setSelectedFirstConsiderations([]);
       setSelectedSecondConsiderations([]);
@@ -234,6 +240,10 @@ export default function AdultInput() {
         });
       }
 
+      // 성별 및 세부 연령대 정보 가져오기
+      const gender = localStorage.getItem("selectedGender") || null;
+      const ageGroup = localStorage.getItem("selectedDetailedAge") || null;
+
       const result = {
         worker: selectedWorker,
         category: selectedCategory,
@@ -242,6 +252,8 @@ export default function AdultInput() {
         secondConsiderations: selectedSecondConsiderations,
         primaryDisease,
         ktasLevel: lowestKtasLevel,
+        gender: gender,
+        ageGroup: ageGroup,
       };
 
       localStorage.setItem("ktasResult", JSON.stringify(result));

@@ -155,7 +155,7 @@ body {
   overflow: hidden;
   background: var(--white);
   border-radius: var(--radius-xl);
-  padding: var(--spacing-2xl);
+  padding: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--gray-200);
 }
@@ -1485,4 +1485,16 @@ button:focus-visible {
   font-size: 18px;
   color: var(--gray-600);
   font-weight: 600;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
