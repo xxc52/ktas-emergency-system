@@ -516,6 +516,81 @@ Uses React's built-in state management with performance optimizations:
    - ✅ 프론트엔드 로그 일관된 스타일로 통일
    - ✅ 복잡한 주소 (순천향대병원 등) geocoding 성공률 대폭 향상
 
+### ✅ Completed (Current Session - 2025-11-02 Part 3):
+
+1. **ngrok 터널 및 Vercel 배포 설정**
+
+   - **ngrok 터널 생성**: `ngrok http 8000` → `https://1bf7fadf6be7.ngrok-free.app`
+   - **환경변수 추가**: `.env.local`에 `NEXT_PUBLIC_LLM_API_URL` 추가
+   - **LLM 서비스 연동**: llmService.js에서 환경변수 사용하도록 수정
+   - **Vercel 환경변수 설정**:
+     - `NEXT_PUBLIC_SUPABASE_URL`
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+     - `NEXT_PUBLIC_VWORLD_API_KEY`
+     - `NEXT_PUBLIC_HOSPITAL_API_KEY`
+     - `NEXT_PUBLIC_LLM_API_URL`
+   - **Files Modified**:
+     - `app/.env.local` - LLM API URL 환경변수 추가
+     - `src/utils/llmService.js` - 환경변수 사용 설정
+
+2. **Vercel Production 환경 Mixed Content 오류 해결**
+
+   - **문제**: HTTPS → HTTP 요청이 브라우저에서 차단됨
+     ```
+     Mixed Content: The page at 'https://ktas-emergency-system.vercel.app/result'
+     was loaded over HTTPS, but requested an insecure resource
+     'http://apis.data.go.kr/...'
+     ```
+   - **원인**: hospital-proxy/route.js가 이전 세션에서 주석 처리되어 비활성화됨
+   - **해결**:
+     - hospital-proxy API Route 완전 활성화
+     - hospitalName 파라미터 지원 추가 (병원명 검색용)
+     - 환경변수 사용 설정 (NEXT_PUBLIC_HOSPITAL_API_KEY)
+     - Production/Localhost 자동 감지 로직 추가
+   - **Files Modified**:
+     - `src/app/api/hospital-proxy/route.js` - 프록시 활성화 + hospitalName 지원
+     - `src/utils/hospitalApi.js` - Production 환경에서 프록시 사용 설정
+
+3. **VWorld Geocoding API 안정성 개선**
+
+   - **문제**: VWorld API에서 502 Bad Gateway 에러 빈번히 발생
+     ```
+     [Geocode Proxy] VWorld API HTTP 502
+     TypeError: fetch failed
+     cause: Error [SocketError]: other side closed
+     ```
+   - **재시도 로직 추가**:
+     - 최대 3번 재시도
+     - Exponential backoff (1초, 2초 대기)
+     - 502, 503 에러 시 자동 재시도
+     - VWorld API 에러 응답도 재시도 대상
+   - **타임아웃 증가**: 10초 → 15초
+   - **User-Agent 추가**: `Mozilla/5.0 (compatible; KTAS-Emergency-System/1.0)`
+   - **Files Modified**:
+     - `src/app/api/geocode/route.js` - 재시도 로직 + 타임아웃 증가
+
+4. **VWorld API domain 파라미터 추가**
+
+   - **발견**: VWorld API 문서에서 브라우저 사용 시 domain 파라미터 필수 요구사항 확인
+     - "https나 Flex 등 웹뷰어가 아닌 브라우저에서의 API사용은 요청URL에 도메인정보를 추가하여 서비스를 이용합니다."
+   - **해결**:
+     - Vercel deployment URL을 domain 파라미터로 추가
+     - `&domain=https://ktas-emergency-system.vercel.app`
+   - **Files Modified**:
+     - `src/app/api/geocode/route.js` - domain 파라미터 추가
+
+5. **검증된 개선사항:**
+   - ✅ ngrok 터널로 Vercel에서 로컬 LLM 접근 가능
+   - ✅ Vercel 환경변수 5개 모두 설정 완료
+   - ✅ Mixed Content 에러 해결 (HTTPS 프록시 정상 작동)
+   - ✅ VWorld Geocoding API 재시도 로직으로 안정성 향상
+   - ✅ VWorld API domain 파라미터 추가로 브라우저 요구사항 충족
+
+6. **주요 참고사항:**
+   - **ngrok URL 갱신**: ngrok 무료 버전은 8시간마다 URL 변경 → Vercel 환경변수 업데이트 필요
+   - **환경변수 위치**: Vercel Dashboard → Settings → Environment Variables
+   - **Redeploy 필요**: 환경변수 변경 후 자동 redeploy 트리거됨
+
 ### 🎯 Next Steps (Immediate):
 
 **1. 병원 스코어링 및 거리 반경 수정**
