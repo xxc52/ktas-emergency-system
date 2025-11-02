@@ -27,9 +27,10 @@ export async function GET(request) {
 
   console.log(`[Geocode Proxy] Request: ${address}`);
 
-  // VWorld API는 브라우저 사용 시 domain 파라미터 필수
-  const domain = 'https://ktas-emergency-system.vercel.app';
-  const vworldUrl = `https://api.vworld.kr/req/address?service=address&request=getcoord&type=ROAD&address=${encodeURIComponent(address)}&format=json&key=${VWORLD_API_KEY}&domain=${encodeURIComponent(domain)}`;
+  // VWorld API - domain 파라미터 없이 시도 (API 키 도메인 등록 이슈 확인)
+  const vworldUrl = `https://api.vworld.kr/req/address?service=address&request=getcoord&type=ROAD&address=${encodeURIComponent(address)}&format=json&key=${VWORLD_API_KEY}`;
+
+  console.log(`[Geocode Proxy] VWorld URL (without domain): ${vworldUrl}`);
 
   // 재시도 로직 (최대 3번)
   let lastError = null;
