@@ -593,50 +593,70 @@ Uses React's built-in state management with performance optimizations:
 
 ### ✅ Completed (Current Session - 2025-11-02 Part 4):
 
-1. **모바일 Viewport 최적화 (Hybrid Approach)**
+1. **Vercel 리전 설정 및 API 최적화**
+
+   - **문제**: VWorld Geocoding API 502 Bad Gateway 에러 빈번 발생
+   - **시도한 해결책**:
+     - VWorld API에 domain 파라미터 추가 (브라우저 요구사항)
+     - Vercel 리전을 icn1 (Seoul) 으로 설정 → 한국 API 접근 개선
+     - `vercel.json` 생성: 리전 설정 및 서버리스 함수 타임아웃 30초 설정
+     - API Route에 `runtime = 'nodejs'` 명시
+
+   - **Files Modified**:
+     - `src/app/api/geocode/route.js` - runtime 설정, domain 파라미터
+     - `vercel.json` - 신규 생성 (리전 및 타임아웃 설정)
+
+2. **모바일 Viewport 최적화 (최종 버전 - Simple Approach)**
 
    - **문제**: 핸드폰에서 접속 시 레이아웃이 깨짐 (태블릿 전용 앱)
-   - **전략**: 전체 레이아웃은 1024px 강제 + Bottom Navigation만 확대
+   - **최종 해결책**: "데스크탑 사이트" 모드처럼 작동 (심플)
 
-   **구현 내용**:
-   - **MobileViewportManager 컴포넌트** (`src/components/MobileViewportManager.js`)
-     - 500px 미만 디바이스 자동 감지
-     - Viewport를 1024px로 강제 설정
-     - `mobile-mode` 클래스 자동 추가
-     - 화면 회전/리사이즈 감지
+   **구현 방법**:
+   - Next.js metadata에서 viewport export 사용 (server-side)
+   - **모든 페이지**: 1024 x 1024 viewport 고정
+   - **Bottom Navigation**: 원래 크기 유지 (건드리지 않음)
+   - **사용자**: 확대/축소 자유
 
-   - **CSS 모바일 모드 스타일** (`src/app/globals.css`)
-     - Bottom Navigation: 1.8배 scale 확대
-     - Position: fixed (화면 하단 고정)
-     - z-index: 99999 (최상단 표시)
-     - 터치 영역 확대 (min-height: 48px)
-     - 폰트 크기/굵기 증가 (17px, bold)
+   **Viewport 설정**:
+   ```javascript
+   export const viewport = {
+     width: 1024,
+     height: 1024,
+     initialScale: 1.0,
+     userScalable: true,
+   };
+   ```
 
-   - **Layout 통합** (`src/app/layout.js`)
-     - MobileViewportManager 전역 적용
+   - **Files Modified**:
+     - `src/app/layout.js` - viewport export 추가
+     - `src/app/profile/layout.js` - 신규 생성 (profile 페이지용 viewport)
 
-2. **효과**:
-   - ✅ 레이아웃 깨짐 방지 (1024px 강제)
-   - ✅ Navigation 버튼 터치하기 쉬움 (1.8배 확대)
-   - ✅ 컨텐츠가 Navigation에 가려지지 않음 (padding 자동 조정)
-   - ✅ 태블릿/데스크톱은 영향 없음 (정상 작동)
+3. **삭제된 복잡한 구현들**:
+   - ❌ MobileViewportManager 컴포넌트 (삭제)
+   - ❌ mobile-mode CSS 스타일 (삭제)
+   - ❌ JavaScript 기반 동적 감지 (불필요)
+   - ❌ Bottom navigation scale 조정 (제거)
 
-3. **기술 세부사항**:
-   - **임계값**: 500px (모바일/태블릿 구분)
-   - **강제 Viewport**: 1024px (태블릿 기준)
-   - **Scale**: 1.8x (Navigation만)
-   - **확대/축소 범위**: 0.5x ~ 3x (사용자 조정 가능)
+4. **효과**:
+   - ✅ 모든 디바이스에서 1024x1024 viewport
+   - ✅ 모바일에서 "데스크탑 사이트" 모드처럼 작동
+   - ✅ 사용자가 확대/축소 자유롭게 가능
+   - ✅ 모든 페이지 일관 적용 (profile 포함)
+   - ✅ 새로고침 필요 없음
+   - ✅ 로그 없음, 무한 루프 없음
 
-4. **Files Modified**:
-   - `src/components/MobileViewportManager.js` - 신규 생성 (모바일 감지 컴포넌트)
-   - `src/app/layout.js` - MobileViewportManager 추가
-   - `src/app/globals.css` - mobile-mode 스타일 추가 (47줄)
+5. **기술 세부사항**:
+   - **Viewport**: 1024 x 1024 (정사각형)
+   - **Initial Scale**: 1.0 (딱 맞게)
+   - **User Scalable**: true (확대/축소 허용)
+   - **적용 방식**: Next.js metadata export (server-side)
 
-5. **검증된 개선사항:**
-   - ✅ 핸드폰에서 태블릿 UI 그대로 표시 (축소되어 보임)
-   - ✅ Bottom Navigation 버튼 크고 누르기 쉬움
-   - ✅ 사용자가 확대/축소로 세부 조정 가능
-   - ✅ 태블릿 전용 설계 유지하면서 모바일 접근성 확보
+6. **검증된 개선사항:**
+   - ✅ 핸드폰에서 태블릿 UI 그대로 표시
+   - ✅ 확대/축소 정상 작동
+   - ✅ 좌우 스크롤 정상 작동
+   - ✅ Bottom Navigation 원래 크기 유지
+   - ✅ Profile 페이지 포함 모든 페이지 정상 작동
 
 ### 🎯 Next Steps (Immediate):
 
