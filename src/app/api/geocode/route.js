@@ -5,6 +5,10 @@ import { NextResponse } from 'next/server';
  * 주소를 좌표로 변환하는 CORS 우회용 Next.js API Route
  */
 
+// Vercel 서버리스 함수 설정
+export const runtime = 'nodejs'; // Edge Runtime 대신 Node.js Runtime 사용
+export const maxDuration = 30; // 최대 30초 타임아웃
+
 const VWORLD_API_KEY = process.env.NEXT_PUBLIC_VWORLD_API_KEY;
 
 export async function GET(request) {

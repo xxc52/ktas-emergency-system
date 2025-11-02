@@ -1,0 +1,11 @@
+{
+  "regions": ["icn1"],
+  "functions": {
+    "src/app/api/geocode/route.js": {
+      "maxDuration": 30
+    },
+    "src/app/api/hospital-proxy/route.js": {
+      "maxDuration": 30
+    }
+  }
+}
