@@ -1,9 +1,15 @@
 import "./globals.css";
-import MobileViewportManager from "@/components/MobileViewportManager";
 
 export const metadata = {
   title: "KTAS 응급구조시스템 - 히포KU라테스",
   description: "응급구조대원을 위한 KTAS 응급도 분류 시스템",
+  viewport: {
+    width: 1024,
+    initialScale: 0.5,
+    minimumScale: 0.1,
+    maximumScale: 5,
+    userScalable: true,
+  },
   openGraph: {
     title: "KTAS 응급구조시스템 - 히포KU라테스",
     description: "응급구조대원을 위한 KTAS 응급도 분류 시스템",
@@ -30,7 +36,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko">
       <body>
-        <MobileViewportManager />
         {children}
       </body>
     </html>
