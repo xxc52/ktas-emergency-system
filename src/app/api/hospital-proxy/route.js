@@ -18,25 +18,33 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const region = searchParams.get('region');
     const departmentCode = searchParams.get('departmentCode');
+    const hospitalName = searchParams.get('hospitalName'); // 병원명 검색 추가
 
-    if (!region || !departmentCode) {
+    // 병원명 검색 또는 지역+진료과목 검색
+    if (!hospitalName && (!region || !departmentCode)) {
       return NextResponse.json(
-        { error: '지역과 진료과목 코드가 필요합니다.' },
+        { error: '병원명 또는 (지역 + 진료과목 코드)가 필요합니다.' },
         { status: 400 }
       );
     }
 
-    console.log(`[Hospital Proxy] ${region}, ${departmentCode}`);
-
-    // 국립중앙의료원 API 호출
+    // 국립중앙의료원 API 호출 파라미터 구성
     const params = new URLSearchParams({
       ServiceKey: HOSPITAL_API_CONFIG.SERVICE_KEY,
-      Q0: region,
-      QD: departmentCode,
-      numOfRows: HOSPITAL_API_CONFIG.DEFAULT_NUM_OF_ROWS,
+      numOfRows: hospitalName ? 10 : HOSPITAL_API_CONFIG.DEFAULT_NUM_OF_ROWS,
       pageNo: 1,
       _type: 'json'
     });
+
+    // 병원명 검색 또는 지역+진료과목 검색
+    if (hospitalName) {
+      params.append('QN', hospitalName);
+      console.log(`[Hospital Proxy] 병원명: ${hospitalName}`);
+    } else {
+      params.append('Q0', region);
+      params.append('QD', departmentCode);
+      console.log(`[Hospital Proxy] 지역: ${region}, 진료과목: ${departmentCode}`);
+    }
 
     const url = `${HOSPITAL_API_CONFIG.BASE_URL}?${params.toString()}`;
 

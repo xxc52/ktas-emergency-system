@@ -191,16 +191,27 @@ function normalizeHospitalData(hospital) {
  */
 export async function searchHospitalByName(hospitalName) {
   try {
+    // Vercel 환경에서는 프록시 사용, 로컬에서는 직접 호출
+    const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 
-    const params = new URLSearchParams({
-      ServiceKey: HOSPITAL_API_CONFIG.SERVICE_KEY,
-      QN: hospitalName,
-      pageNo: 1,
-      numOfRows: 10,
-      _type: 'json'
-    });
-
-    const url = `${HOSPITAL_API_CONFIG.BASE_URL}?${params.toString()}`;
+    let url;
+    if (isProduction) {
+      // Vercel 환경: 프록시 API 사용
+      const params = new URLSearchParams({
+        hospitalName: hospitalName
+      });
+      url = `${HOSPITAL_API_CONFIG.PROXY_URL}?${params.toString()}`;
+    } else {
+      // 로컬 환경: 직접 API 호출
+      const params = new URLSearchParams({
+        ServiceKey: HOSPITAL_API_CONFIG.SERVICE_KEY,
+        QN: hospitalName,
+        pageNo: 1,
+        numOfRows: 10,
+        _type: 'json'
+      });
+      url = `${HOSPITAL_API_CONFIG.BASE_URL}?${params.toString()}`;
+    }
 
     const response = await fetch(url, {
       method: 'GET',
