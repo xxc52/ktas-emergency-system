@@ -25,13 +25,21 @@ export default function MobileViewportManager() {
 
       if (window.innerWidth < MOBILE_THRESHOLD) {
         // 모바일: 태블릿 뷰포트 강제
-        viewport.content = `width=${TABLET_WIDTH}, initial-scale=1, minimum-scale=0.5, maximum-scale=3, user-scalable=yes`;
+        // initial-scale을 자동 계산 (핸드폰 너비에 맞게 축소)
+        const scale = window.innerWidth / TABLET_WIDTH;
+        viewport.content = `width=${TABLET_WIDTH}, initial-scale=${scale}, minimum-scale=${scale * 0.5}, maximum-scale=${scale * 3}, user-scalable=yes`;
+
         document.body.classList.add('mobile-mode');
-        console.log(`[Viewport] 모바일 감지 (${window.innerWidth}px) → 태블릿 모드 강제 (${TABLET_WIDTH}px)`);
+        document.documentElement.classList.add('mobile-mode');
+
+        console.log(`[Viewport] 모바일 감지 (${window.innerWidth}px) → 태블릿 모드 강제 (${TABLET_WIDTH}px, scale: ${scale.toFixed(2)})`);
       } else {
         // 태블릿/데스크톱: 정상
         viewport.content = 'width=device-width, initial-scale=1';
+
         document.body.classList.remove('mobile-mode');
+        document.documentElement.classList.remove('mobile-mode');
+
         console.log(`[Viewport] 태블릿/데스크톱 감지 (${window.innerWidth}px) → 정상 모드`);
       }
     };
