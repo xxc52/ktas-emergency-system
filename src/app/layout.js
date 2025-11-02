@@ -1,4 +1,5 @@
 import "./globals.css";
+import MobileViewportManager from "@/components/MobileViewportManager";
 
 export const metadata = {
   title: "KTAS 응급구조시스템 - 히포KU라테스",
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko">
       <body>
+        <MobileViewportManager />
         {children}
       </body>
     </html>
