@@ -5,13 +5,13 @@
 
 // LLM API 기본 설정
 const LLM_CONFIG = {
-  BASE_URL: "https://1bf7fadf6be7.ngrok-free.app", // ngrok 터널 (로컬 LLM 서버)
+  BASE_URL: process.env.NEXT_PUBLIC_LLM_API_URL || "http://localhost:8000", // LLM 서버 (로컬 또는 ngrok)
   ENDPOINTS: {
     HEALTH: "/health",
     DEPARTMENT: "/department",
     EMERGENCY_FILTERS: "/emergency-filters", // 응급실 필터 판단 (KTAS 1-4급)
   },
-  TIMEOUT: 100000, // 100초 타임아웃 (MedGemma-4B 모델 응답 시간 고려)
+  TIMEOUT: 100000, // 100초 타임아웃 (GPT-5-mini 응답 시간 고려)
 };
 
 /**
