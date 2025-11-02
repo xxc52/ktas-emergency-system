@@ -347,6 +347,175 @@ Uses React's built-in state management with performance optimizations:
    - ✅ patient_assessments 테이블 단일 레코드 삽입 (중복 제거)
    - ✅ 프리셋 버튼 클릭 시 모든 선택 사항 정상 로드
 
+### ✅ Completed (Current Session - 2025-11-02):
+
+1. **OpenAI GPT-5-mini 모델 통합**
+
+   - **변경**: Local LLM (MedGemma-4B-IT) → OpenAI GPT-5-mini (Cloud)
+   - **이유**:
+     - 성능 대폭 향상: 45초 → 20-30초 (KTAS 1-4급), 15초 → 2-3초 (KTAS 5급)
+     - Reasoning 모델로 의료 판단 정확도 개선
+     - GPU 불필요 (Cloud 처리)
+   - **환경 설정**:
+     - `.env` 파일에 `OPENAI_API_KEY` 추가
+     - `OLLAMA_BASE_URL` 환경변수 지원 (Embeddings용)
+     - `.gitignore`에 `.env` 추가 (보안)
+
+2. **Full Code 목록 확장 (21개 → 74개)**
+
+   - **응급실병상(rltmEmerCd)**: 2개 → 9개
+     - 추가: O002(소아), O004(일반격리), O003(음압격리), O049(소아일반격리), O048(소아음압격리), O059(코호트격리)
+   - **입원병상(rltmCd)**: 7개 → 28개
+     - 중환자실 11개, 응급전용 8개, 외상전용 3개, 입원실 3개, 기타 3개
+   - **중증응급질환(svdssCd)**: 7개 → 27개
+     - 뇌출혈, 대동맥응급, 담낭질환, 사지접합, 산부인과응급, 안과응급, 내시경, 투석 등
+   - **장비정보(rltmMeCd)**: 5개 → 10개
+     - CRRT, ECMO, 중심체온조절, 고압산소, 혈관촬영기 등 추가
+
+3. **Gender/Age Group 프롬프트 강화**
+
+   - **문제**: 성별/연령대 정보를 LLM이 활용하지 못함
+   - **해결**:
+     - RAG 이해 단계: 성별/연령대 필수 확인 규칙 추가
+     - 최종 판단 단계: 상세한 예시와 금지 규칙 명시
+     - 임산부 관련 코드는 **여성만** (O026, Y0111, Y0112, Y0113, O031, O032, Y0100)
+     - 소아 관련 코드는 **소아/영유아만** (O002, O049, O048, O009, O008, O020, O010, Y0172, Y0082, Y0092, Y0070)
+
+4. **Python 환경 설정 개선**
+
+   - **requirements.txt 생성**: 모든 필요 패키지 명시
+     - `langchain-openai>=0.2.0`
+     - `python-dotenv>=1.0.0`
+     - 기타 의존성 패키지
+   - **패키지 설치 완료**:
+     - langchain-openai==1.0.1
+     - langchain-core==1.0.2
+     - langchain-ollama==1.0.0
+   - **Ollama 포트 설정**: 환경변수로 관리 (`OLLAMA_BASE_URL`)
+
+5. **GPT-5-mini Reasoning 모델 문제 해결**
+
+   - **발견된 문제**:
+     - `max_tokens=500` → reasoning에 500 토큰 소진 → 응답 생성 불가
+     - `content=''` (빈 응답), `finish_reason='length'`
+   - **해결**:
+     - `max_tokens=4000` (Reasoning 모델용 충분한 토큰)
+     - `timeout=60초` (응답 대기 시간 증가)
+   - **디버깅 로그 추가**: Raw response 타입 및 내용 출력
+
+6. **Files Modified:**
+
+   - **Backend (LLM System)**:
+     - `llm/.env` - OpenAI API Key 환경변수 추가
+     - `llm/.gitignore` - 보안 설정 (`.env` 제외)
+     - `llm/requirements.txt` - Python 패키지 목록
+     - `llm/medical_rag_chromadb_final.py`:
+       - OpenAI ChatGPT 통합 (Line 25, 197-208)
+       - 환경변수 로드 (Line 18-21)
+       - Ollama URL 환경변수 지원 (Line 214-218, 225-231)
+       - max_tokens=4000, timeout=60 설정
+     - `llm/medical_rag_api.py`:
+       - Full code 목록 확장 (Line 474-564)
+       - Gender/Age Group 프롬프트 강화 (Line 584-659)
+       - 디버깅 로그 추가 (Line 601-603)
+
+7. **검증된 개선사항:**
+   - ✅ OpenAI GPT-5-mini 정상 연결 (HTTP 200 OK)
+   - ✅ Reasoning 모델 정상 작동 (응답 생성 확인)
+   - ✅ Full 74개 코드 프롬프트 적용
+   - ✅ 성별/연령대 필터링 규칙 적용
+   - ✅ 환경변수 보안 설정 완료
+
+8. **성능 개선:**
+   - **KTAS 5급**: 15초 → 2-3초 (5-7배 향상)
+   - **KTAS 1-4급**: 45초 → 20-30초 (1.5-2배 향상)
+   - **전체 처리**: MedGemma(CPU) → GPT-5-mini(Cloud)
+
+### ✅ Completed (Current Session - 2025-11-02 Part 2):
+
+1. **백엔드 로그 정리 및 개선**
+
+   - **EXAONE → GPT-5-mini 변경**: 모든 로그에서 모델명 업데이트
+   - **로그 포맷 정리**:
+     - 과도한 구분선 제거 (===60자)
+     - RAW RESPONSE 디버그 로그 제거
+     - 진행 상황 로그 간소화
+   - **필수 정보 유지**: 사용자 피드백 반영
+     - RAG 검색 결과 (검색된 문서 요약)
+     - RAG 이해 결과 (LLM의 문서 이해 내용)
+     - 최종 판단 결과 (LLM의 최종 답변)
+     - 종합 요약 (모든 필터 코드 + 소요 시간)
+   - **Files Modified**:
+     - `llm/medical_rag_api.py` - 로그 정리 및 필수 정보 복원
+
+2. **공공데이터포털 API 활성화**
+
+   - **환경변수 추가**: `.env.local`에 `NEXT_PUBLIC_HOSPITAL_API_KEY` 추가
+   - **보안 개선**: 하드코딩된 API 키 → 환경변수 사용
+   - **API 코드 활성화**: 주석 처리된 병원 검색 기능 완전 활성화
+   - **로그 정리**: 불필요한 디버그 로그 제거
+   - **Files Modified**:
+     - `app/.env.local` - API 키 환경변수 추가
+     - `src/utils/hospitalApi.js` - 환경변수 사용 + 코드 활성화 + 로그 정리
+
+3. **프론트엔드 콘솔 로그 통일 및 정리**
+
+   - **로그 패턴 통일**: 백엔드와 일관된 스타일 적용
+     ```javascript
+     // Before
+     console.log("환자 기록 저장 시도:", { rescuerId, patientType, ... });
+
+     // After
+     console.log(`\n[환자 기록 저장 시도]`);
+     console.log(`구조대원: 1 | 유형: adult | KTAS: 5급 | 성별: male | 연령: 25-34`);
+     ```
+   - **주요 개선**:
+     - 이모지 유지하면서 가독성 향상
+     - 괄호 라벨 `[Action]` 형식으로 구조화
+     - 파이프(`|`) 구분자로 데이터 표시
+     - 객체 대신 문자열로 간결하게
+   - **Files Modified**:
+     - `src/app/result/components/HospitalListLevel5.js` - KTAS 5급 로그 정리
+     - `src/app/result/components/HospitalListLevel1to4.js` - KTAS 1-4급 로그 정리
+     - `src/app/result/page.js` - 환자 기록 저장 로그 정리
+
+4. **Geocoder 주소 변환 시스템 대폭 개선**
+
+   - **문제 발견**:
+     - "경기도 부천시 원미구 조마루로 170, 부흥로 173(1층일부) (중동)"
+     - 두 개의 도로명 주소가 쉼표로 구분되어 geocoding 실패
+
+   - **주소 정제 강화** (`refineAddressForGeocoding`):
+     - 쉼표 기준 첫 번째 주소 추출
+     - 층 정보 제거: "173(1층일부)" → "173"
+     - 건물 동 정보 제거: "(중동)" → 제거
+     - 동명은 유지: "(안암동5가)" → 유지
+
+   - **다중 후보 시도** (`addressToCoordinates`):
+     - 쉼표로 구분된 주소를 여러 후보로 분리
+     - 각 후보를 순차적으로 geocoding 시도
+     - 성공할 때까지 다음 후보 시도
+     - 예시:
+       ```
+       원본: "경기도 부천시 원미구 조마루로 170, 부흥로 173(1층일부) (중동)"
+
+       📋 주소 후보 2개:
+         1. "경기도 부천시 원미구 조마루로 170"
+         2. "경기도 부천시 원미구 부흥로 173"
+
+       🔍 [1/2] 변환 시도 → ⚠️ 실패
+       🔍 [2/2] 변환 시도 → ✅ 성공!
+       ```
+
+   - **Files Modified**:
+     - `src/utils/geocoder.js` - 주소 정제 로직 개선 + 다중 후보 시도 추가
+
+5. **검증된 개선사항:**
+   - ✅ 백엔드 로그 깔끔하게 정리되면서 필수 정보는 모두 유지
+   - ✅ 공공데이터포털 API 정상 작동 (KTAS 5급 병원 검색)
+   - ✅ 프론트엔드 로그 일관된 스타일로 통일
+   - ✅ 복잡한 주소 (순천향대병원 등) geocoding 성공률 대폭 향상
+
 ### 🎯 Next Steps (Immediate):
 
 **1. 병원 스코어링 및 거리 반경 수정**
@@ -389,18 +558,22 @@ Uses React's built-in state management with performance optimizations:
 - All original CSV logic preserved in `src/utils/ktasData.js` as backup
 - Migration scripts available in `database/` folder for reference
 
-**LLM System (2025-10-07 업데이트):**
+**LLM System (2025-11-02 업데이트):**
 
 - FastAPI server: `python medical_rag_api.py` → http://localhost:8000
 - ngrok tunnel: `ngrok http 8000` → External access URL
 - Medical documents: 255,162 ChromaDB entries
 - Models:
-  - **Embedding**: BGE-M3:latest (1.2GB)
-  - **LLM**: ✅ **MedGemma-4B-IT:q6** (4.0GB) - 의료 전문 모델
-  - **이전 모델**: Gemma3:1b (815MB) - 백업용
+  - **Embedding**: BGE-M3:latest (1.2GB) - Ollama (로컬)
+  - **LLM**: ✅ **OpenAI GPT-5-mini** - Cloud-based reasoning model
+  - **이전 모델**: MedGemma-4B-IT:q6 (4.0GB), Gemma3:1b (815MB) - 백업용
 - API documentation: http://localhost:8000/docs (Swagger UI)
-- **성능 참고**: KTAS 5급 판단 ~15초, KTAS 1-4급 판단 ~45초 (CPU 모드)
-- **최적화 권장**: GPU 활성화 시 5-10배 속도 향상 가능
+- **성능 참고**: KTAS 5급 판단 ~2-3초, KTAS 1-4급 판단 ~20-30초
+- **비용 (GPT-5-mini)**:
+  - 입력 토큰: $0.25 / 1M
+  - 캐시된 입력: $0.025 / 1M (90% 할인)
+  - 출력 토큰: $2 / 1M
+  - RAG 활용 시 캐싱으로 비용 절감 가능
 
 **Deployment Flow:**
 

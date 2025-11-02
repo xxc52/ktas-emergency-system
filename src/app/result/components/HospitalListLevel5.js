@@ -24,7 +24,8 @@ export default function HospitalListLevel5({ currentLocation, patientData, onHos
       setLoading(true);
       setError(null);
 
-      console.log('KTAS 5급 환자 병원 검색 시작:', patientData);
+      console.log(`\n[KTAS 5급 병원 검색 시작]`);
+      console.log(`병명: ${patientData.primaryDisease || patientData.disease} | 성별: ${patientData.gender || '미상'} | 연령: ${patientData.ageGroup || '미상'}`);
 
       // 1. LLM을 통한 진료과목 코드 판단
       const departmentResult = await determineDepartmentCode({
@@ -38,11 +39,11 @@ export default function HospitalListLevel5({ currentLocation, patientData, onHos
       });
 
       setLlmStatus(departmentResult);
-      console.log('진료과목 판단 결과:', departmentResult);
+      console.log(`✅ [진료과목 판단] ${departmentResult.departmentName} (${departmentResult.departmentCode})`);
 
       // 2. 검색할 지역 결정
       const regions = await getRegionsForSearch(currentLocation);
-      console.log('검색 대상 지역:', regions);
+      console.log(`📍 [검색 지역] ${regions.join(', ')}`);
 
       // 3. 병원 검색 및 거리순 정렬
       const searchResults = await searchAndSortHospitals(
@@ -52,7 +53,7 @@ export default function HospitalListLevel5({ currentLocation, patientData, onHos
         20 // KTAS 5급: 20개 병원 표시
       );
 
-      console.log('병원 검색 결과:', searchResults.length, '개');
+      console.log(`✅ [병원 검색 완료] ${searchResults.length}개 병원\n`);
 
       // 4. 병원 데이터 표시용으로 변환
       const formattedHospitals = searchResults.map(hospital => ({
@@ -72,7 +73,7 @@ export default function HospitalListLevel5({ currentLocation, patientData, onHos
       }
 
     } catch (error) {
-      console.error('병원 검색 실패:', error);
+      console.error('❌ [병원 검색 실패]', error.message);
       setError(error.message);
 
       // 에러 발생 시 기본 병원 목록 표시

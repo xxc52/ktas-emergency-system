@@ -8,7 +8,47 @@ const VWORLD_API_KEY = process.env.NEXT_PUBLIC_VWORLD_API_KEY;
 const GEOCODER_BASE_URL = 'https://api.vworld.kr/req/address';
 
 /**
- * 주소를 좌표로 변환
+ * 주소를 좌표로 변환 (내부 헬퍼 함수)
+ * @param {string} address - 변환할 주소
+ * @returns {Promise<{lat: number, lng: number, refinedAddress: string} | null>}
+ */
+async function _geocodeAddress(address) {
+  try {
+    // Next.js API 라우트를 통해 프록시 호출 (CORS 우회)
+    const url = `/api/geocode?address=${encodeURIComponent(address)}`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    // VWorld API 응답 구조 확인
+    if (data.response && data.response.status === 'OK') {
+      const result = data.response.result;
+
+      if (result && result.point) {
+        const coordinates = {
+          lat: parseFloat(result.point.y),
+          lng: parseFloat(result.point.x),
+          refinedAddress: result.text || address
+        };
+
+        return coordinates;
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error(`❌ Geocoding 요청 실패:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * 주소를 좌표로 변환 (다중 후보 시도)
  * @param {string} address - 변환할 주소
  * @param {string} type - 주소 타입 ('ROAD' for 도로명주소, 'PARCEL' for 지번주소)
  * @returns {Promise<{lat: number, lng: number, refinedAddress: string} | null>}
@@ -24,48 +64,57 @@ export async function addressToCoordinates(address, type = 'ROAD') {
     return null;
   }
 
-  try {
-    console.log(`🔍 주소 변환 시도: "${address}"`);
+  console.log(`🔍 주소 변환 시도: "${address}"`);
 
-    // Next.js API 라우트를 통해 프록시 호출 (CORS 우회)
-    const url = `/api/geocode?address=${encodeURIComponent(address)}`;
-    console.log(`📡 API 요청: ${url}`);
+  // 여러 주소 후보 생성
+  const addressCandidates = [];
 
-    const response = await fetch(url);
+  // 1. 쉼표로 분리된 주소 파싱
+  const parts = address.split(',').map(p => p.trim());
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    console.log('📄 API 응답:', data);
-
-    // VWorld API 응답 구조 확인
-    if (data.response && data.response.status === 'OK') {
-      const result = data.response.result;
-
-      if (result && result.point) {
-        const coordinates = {
-          lat: parseFloat(result.point.y),
-          lng: parseFloat(result.point.x),
-          refinedAddress: result.text || address
-        };
-
-        console.log(`✅ 좌표 변환 성공: ${address} → (${coordinates.lat}, ${coordinates.lng})`);
-        return coordinates;
-      } else {
-        console.warn(`⚠️ 좌표를 찾을 수 없습니다: ${address}`);
-        return null;
+  if (parts.length > 1) {
+    // 쉼표로 구분된 경우, 각 부분을 후보로 추가
+    parts.forEach(part => {
+      // 기본 주소 (시/도 + 구/군 + 도로명)
+      const match = part.match(/^(.*?[시도])\s+(.*?[구군])\s+(.+)$/);
+      if (match) {
+        addressCandidates.push(part);
+      } else if (part.includes('로') || part.includes('길')) {
+        // 두 번째 부분에 시/도가 없으면 첫 번째 부분의 시/도 + 구/군 추가
+        const firstMatch = parts[0].match(/^(.*?[시도])\s+(.*?[구군])/);
+        if (firstMatch) {
+          addressCandidates.push(`${firstMatch[1]} ${firstMatch[2]} ${part}`);
+        } else {
+          addressCandidates.push(part);
+        }
       }
-    } else {
-      console.error('❌ API 응답 오류:', data.response?.status || 'Unknown error');
-      return null;
-    }
-
-  } catch (error) {
-    console.error(`❌ 주소 변환 실패 (${address}):`, error);
-    return null;
+    });
+  } else {
+    // 쉼표가 없으면 원본 주소 사용
+    addressCandidates.push(address);
   }
+
+  console.log(`📋 주소 후보 ${addressCandidates.length}개: ${addressCandidates.join(' | ')}`);
+
+  // 각 후보에 대해 정제 및 geocoding 시도
+  for (let i = 0; i < addressCandidates.length; i++) {
+    const candidate = addressCandidates[i];
+    const refinedCandidate = refineAddressForGeocoding(candidate);
+
+    console.log(`🔍 [${i + 1}/${addressCandidates.length}] 변환 시도: "${refinedCandidate}"`);
+
+    const coordinates = await _geocodeAddress(refinedCandidate);
+
+    if (coordinates) {
+      console.log(`✅ 좌표 변환 성공: "${refinedCandidate}" → (${coordinates.lat}, ${coordinates.lng})`);
+      return coordinates;
+    } else {
+      console.warn(`⚠️ 변환 실패, 다음 후보 시도...`);
+    }
+  }
+
+  console.error(`❌ 모든 주소 후보 변환 실패: ${address}`);
+  return null;
 }
 
 /**
@@ -113,12 +162,33 @@ export async function batchAddressToCoordinates(addressList, delay = 100) {
 export function refineAddressForGeocoding(address) {
   if (!address) return '';
 
-  // 최소한의 정제만 수행 (VWorld API는 원본 주소를 선호)
-  let refined = address
-    .replace(/\d{2,3}-\d{3,4}-\d{4}/g, '') // 전화번호만 제거
-    .replace(/[,;]/g, ' ') // 쉼표, 세미콜론을 공백으로 변경
-    .replace(/\s+/g, ' ') // 중복 공백 정리
-    .trim();
+  let refined = address;
+
+  // 1. 전화번호 제거
+  refined = refined.replace(/\d{2,3}-\d{3,4}-\d{4}/g, '');
+
+  // 2. 쉼표 기준 분리 (여러 주소가 쉼표로 구분된 경우)
+  const addressParts = refined.split(',');
+
+  // 3. 첫 번째 주소에서 도로명 주소 패턴 찾기
+  let mainAddress = addressParts[0].trim();
+
+  // 4. 층 정보 제거 (예: "173(1층일부)", "15(3층)", "101(지하1층)" 등)
+  mainAddress = mainAddress.replace(/\d+\([^)]*층[^)]*\)/g, (match) => {
+    // 괄호 앞의 번호만 남기기
+    return match.match(/^\d+/)[0];
+  });
+
+  // 5. 동/호 정보가 포함된 괄호 제거 (예: "(중동)", "(101동)", "(A동 302호)" 등)
+  // 단, 동명(안암동5가)은 유지
+  mainAddress = mainAddress.replace(/\s*\([^)]*동\s*\d*호?[^)]*\)/g, '');
+
+  // 6. 건물명 뒤의 추가 정보 제거 (괄호 안에 동명이 있는 경우는 유지)
+  // 예: "고려대병원 (안암동5가)" → 유지
+  // 예: "병원 (1층일부)" → "(1층일부)" 제거
+
+  // 7. 중복 공백 정리
+  refined = mainAddress.replace(/\s+/g, ' ').trim();
 
   console.log(`🧹 주소 정제: "${address}" → "${refined}"`);
   return refined;

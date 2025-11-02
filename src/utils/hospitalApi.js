@@ -10,8 +10,7 @@ const HOSPITAL_API_CONFIG = {
   BASE_URL:
     "http://apis.data.go.kr/B552657/HsptlAsembySearchService/getHsptlMdcncListInfoInqire",
   PROXY_URL: "/api/hospital-proxy", // Vercel 프록시 API
-  SERVICE_KEY:
-    "4d3689cde20aee7c9a462d2fe3a3bf435084a21af9e13b71c30d6ecb21168c0f",
+  SERVICE_KEY: process.env.NEXT_PUBLIC_HOSPITAL_API_KEY || "",
   DEFAULT_NUM_OF_ROWS: 1000, // 최대 검색 건수
   TIMEOUT: 15000, // 15초 타임아웃
 };
@@ -21,16 +20,10 @@ const HOSPITAL_API_CONFIG = {
  * @param {string} region - 시도명 (예: '서울특별시')
  * @param {string} departmentCode - 진료과목 코드 (예: 'D001')
  * @returns {Promise<Array>} 병원 목록
- *
- * ⚠️ 임시 비활성화: 공공데이터포털 운영 중단으로 인한 에러 방지
  */
 export async function searchHospitalsByDepartment(region, departmentCode) {
-  console.warn("⚠️ 공공데이터포털 API 임시 중단 - 병원 검색 기능 비활성화");
-  return []; // 임시로 빈 배열 반환
-
-  /* 공공데이터포털 API 임시 주석 처리 (운영 중단)
   try {
-    console.log(`병원 검색 요청: ${region}, ${departmentCode}`);
+    console.log(`🏥 [병원 검색] ${region}, ${departmentCode}`);
 
     // Vercel 환경에서는 프록시 사용, 로컬에서는 직접 호출
     const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
@@ -55,7 +48,6 @@ export async function searchHospitalsByDepartment(region, departmentCode) {
         _type: 'json'
       });
       url = `${HOSPITAL_API_CONFIG.BASE_URL}?${params.toString()}`;
-      console.log('Direct API 요청 URL:', url);
     }
 
     const response = await fetch(url, {
@@ -71,12 +63,9 @@ export async function searchHospitalsByDepartment(region, departmentCode) {
     }
 
     const data = await response.json();
-    console.log('API 응답 받음:', data);
 
     // API 응답 구조 확인 및 파싱
     let hospitals = [];
-
-    console.log('API 전체 응답 구조:', JSON.stringify(data, null, 2));
 
     if (data.response && data.response.body && data.response.body.items) {
       // 정상 응답 구조 - items.item 형태
@@ -84,24 +73,19 @@ export async function searchHospitalsByDepartment(region, departmentCode) {
         hospitals = Array.isArray(data.response.body.items.item)
           ? data.response.body.items.item
           : [data.response.body.items.item];
-        console.log('items.item에서 병원 추출:', hospitals.length, '개');
       } else {
         // items가 직접 배열인 경우
         const items = data.response.body.items;
         hospitals = Array.isArray(items) ? items : [items];
-        console.log('items에서 병원 추출:', hospitals.length, '개');
       }
     } else if (data.items) {
       // 다른 응답 구조
       hospitals = Array.isArray(data.items) ? data.items : [data.items];
-      console.log('data.items에서 병원 추출:', hospitals.length, '개');
     } else if (Array.isArray(data)) {
       // 배열 형태로 직접 반환
       hospitals = data;
-      console.log('직접 배열에서 병원 추출:', hospitals.length, '개');
     } else {
-      console.warn('예상치 못한 API 응답 구조:', Object.keys(data));
-      console.warn('전체 데이터:', data);
+      console.warn('⚠️ [병원 검색] 예상치 못한 API 응답 구조');
       return [];
     }
 
@@ -110,14 +94,13 @@ export async function searchHospitalsByDepartment(region, departmentCode) {
       .filter(hospital => hospital && hospital.dutyName) // 유효한 병원만 필터링
       .map(hospital => normalizeHospitalData(hospital));
 
-    console.log(`${region} ${departmentCode} 검색 결과: ${normalizedHospitals.length}개 병원`);
+    console.log(`✅ [병원 검색] ${region} ${departmentCode}: ${normalizedHospitals.length}개`);
     return normalizedHospitals;
 
   } catch (error) {
-    console.error(`병원 검색 실패 (${region}, ${departmentCode}):`, error);
+    console.error(`❌ [병원 검색] 실패 (${region}, ${departmentCode}):`, error.message);
     return []; // 실패 시 빈 배열 반환
   }
-  */
 }
 
 /**
@@ -126,8 +109,6 @@ export async function searchHospitalsByDepartment(region, departmentCode) {
  * @returns {Object} 정규화된 병원 데이터
  */
 function normalizeHospitalData(hospital) {
-  console.log("정규화할 병원 데이터:", hospital);
-
   const normalized = {
     // 기본 정보
     id: hospital.hpid || hospital.dutyName,
@@ -200,7 +181,6 @@ function normalizeHospitalData(hospital) {
     lastUpdated: new Date().toISOString(),
   };
 
-  console.log("정규화 결과:", normalized);
   return normalized;
 }
 
@@ -208,16 +188,9 @@ function normalizeHospitalData(hospital) {
  * 병원명으로 병원 정보 검색 (연락처 조회용)
  * @param {string} hospitalName - 병원명
  * @returns {Promise<Object|null>} 병원 정보 (연락처 포함) 또는 null
- *
- * ⚠️ 임시 비활성화: 공공데이터포털 운영 중단으로 인한 에러 방지
  */
 export async function searchHospitalByName(hospitalName) {
-  console.warn("⚠️ 공공데이터포털 API 임시 중단 - 연락처 조회 기능 비활성화");
-  return null; // 임시로 null 반환
-
-  /* 공공데이터포털 API 임시 주석 처리 (운영 중단)
   try {
-    console.log(`🔍 병원명 검색: "${hospitalName}"`);
 
     const params = new URLSearchParams({
       ServiceKey: HOSPITAL_API_CONFIG.SERVICE_KEY,
@@ -255,20 +228,17 @@ export async function searchHospitalByName(hospitalName) {
     }
 
     if (hospital) {
-      console.log(`✅ 연락처 조회 성공: ${hospital.dutyTel1} / ${hospital.dutyTel3}`);
       return {
         phone: hospital.dutyTel1 || '',
         emergencyPhone: hospital.dutyTel3 || '',
       };
     } else {
-      console.warn(`⚠️ 병원명 검색 결과 없음: ${hospitalName}`);
       return null;
     }
   } catch (error) {
-    console.error(`❌ 병원명 검색 실패 (${hospitalName}):`, error.message);
+    console.error(`❌ [연락처 조회] 실패 (${hospitalName}):`, error.message);
     return null;
   }
-  */
 }
 
 /**
@@ -277,8 +247,6 @@ export async function searchHospitalByName(hospitalName) {
  * @returns {Promise<Map>} 병원 ID를 키로 하는 연락처 정보 맵
  */
 export async function fetchHospitalContacts(hospitals) {
-  console.log(`📞 ${hospitals.length}개 병원 연락처 조회 시작`);
-
   const contactPromises = hospitals.map(async (hospital) => {
     const contact = await searchHospitalByName(hospital.name);
     return { id: hospital.id, contact };
@@ -294,9 +262,7 @@ export async function fetchHospitalContacts(hospitals) {
     }
   });
 
-  console.log(
-    `✅ 연락처 조회 완료: ${contactMap.size}/${hospitals.length}개 성공`
-  );
+  console.log(`✅ [연락처 조회] ${contactMap.size}/${hospitals.length}개 성공`);
   return contactMap;
 }
 
@@ -315,13 +281,6 @@ export async function searchAndSortHospitals(
   limit = 20
 ) {
   try {
-    console.log("병원 통합 검색 시작:", {
-      regions,
-      departmentCode,
-      currentLocation,
-      limit,
-    });
-
     // 모든 지역에서 병원 검색 (병렬 처리)
     const searchPromises = regions.map((region) =>
       searchHospitalsByDepartment(region, departmentCode)
@@ -339,8 +298,6 @@ export async function searchAndSortHospitals(
       });
     });
 
-    console.log(`총 검색된 병원 수: ${allHospitals.length}`);
-
     // 유효한 위치 정보가 있는 병원만 필터링
     const validHospitals = allHospitals.filter(
       (hospital) =>
@@ -349,8 +306,6 @@ export async function searchAndSortHospitals(
         !isNaN(hospital.latitude) &&
         !isNaN(hospital.longitude)
     );
-
-    console.log(`위치 정보가 유효한 병원 수: ${validHospitals.length}`);
 
     // 현재 위치가 없으면 그대로 반환
     if (!currentLocation || !currentLocation.lat || !currentLocation.lng) {
@@ -376,11 +331,11 @@ export async function searchAndSortHospitals(
     // 거리순 정렬
     hospitalsWithDistance.sort((a, b) => a.distance - b.distance);
 
-    console.log(`거리순 정렬 완료, 상위 ${limit}개 반환`);
+    console.log(`✅ [병원 정렬] 거리순 정렬 완료, 상위 ${limit}개 반환`);
 
     return hospitalsWithDistance.slice(0, limit);
   } catch (error) {
-    console.error("병원 통합 검색 실패:", error);
+    console.error("❌ [병원 검색] 통합 검색 실패:", error.message);
     return [];
   }
 }

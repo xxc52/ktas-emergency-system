@@ -121,10 +121,8 @@ export default function HospitalListLevel1to4({
         "info"
       );
 
-      console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-      console.log(`🚨 KTAS ${ktasLevel}급 응급실 검색 시작`);
-      console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-      console.log("환자 정보:", patientData);
+      console.log(`\n[KTAS ${ktasLevel}급 응급실 검색 시작]`);
+      console.log(`병명: ${patientData.primaryDisease || patientData.disease} | 성별: ${patientData.gender || '미상'} | 연령: ${patientData.ageGroup || '미상'}`);
 
       // 1단계: LLM을 통한 필터 판단
       addProgress("🧠 AI가 필요한 응급실 필터를 판단중...", "info");
@@ -142,11 +140,11 @@ export default function HospitalListLevel1to4({
 
       if (filterResult.success) {
         addProgress(`✅ 필터 판단 완료: ${filterResult.reasoning}`, "success");
+        console.log(`✅ [필터 판단 완료]`);
       } else {
         addProgress(`⚠️ LLM 연결 실패, 기본 필터 사용`, "warning");
+        console.log(`⚠️ [LLM 연결 실패] 기본 필터 사용`);
       }
-
-      console.log("\n📋 판단된 필터:", filterResult.filters);
 
       // 2단계: 점진적 확장 검색
       addProgress("🔍 주변 응급실 검색중 (10km → 20km 확장)...", "info");
@@ -161,12 +159,15 @@ export default function HospitalListLevel1to4({
         patientData
       );
 
+      console.log(`✅ [병원 검색 완료] ${rawHospitals.length}개 병원`);
+
       addProgress(
         `📊 검색 완료: ${rawHospitals.length}개 병원 발견`,
         "success"
       );
 
       if (rawHospitals.length === 0) {
+        console.log(`❌ [검색 실패] 수용 가능한 응급실 없음`);
         addProgress("❌ 주변에 수용 가능한 응급실이 없습니다", "error");
         setHospitals([]);
         setLoading(false);
@@ -207,6 +208,7 @@ export default function HospitalListLevel1to4({
       // 상위 20개만 표시
       const topHospitals = scoredHospitals.slice(0, 20);
 
+      console.log(`✅ [병원 우선순위 계산 완료] 상위 ${topHospitals.length}개 선정`);
       addProgress(`✅ 최종 ${topHospitals.length}개 병원 선정 완료`, "success");
 
       // 5단계: 화면 표시용 데이터 변환
@@ -273,11 +275,9 @@ export default function HospitalListLevel1to4({
         const successCount = contactMap.size;
         addProgress(`✅ 연락처 조회 완료 (${successCount}/${formattedHospitals.length})`, "success");
 
-        console.log("\n✅ 응급실 검색 완료");
-        console.log(`📊 총 ${hospitalsWithContacts.length}개 병원 표시`);
-        console.log(`📞 연락처 조회 성공: ${successCount}개\n`);
+        console.log(`✅ [응급실 검색 완료] 총 ${hospitalsWithContacts.length}개 병원 | 연락처: ${successCount}개\n`);
       } catch (contactError) {
-        console.error("연락처 조회 실패:", contactError);
+        console.error("❌ [연락처 조회 실패]", contactError.message);
         addProgress("⚠️ 연락처 조회 실패 (기본 정보만 표시)", "warning");
 
         // 연락처 조회 실패 시 기본 데이터만 표시
@@ -287,7 +287,7 @@ export default function HospitalListLevel1to4({
         }
       }
     } catch (error) {
-      console.error("\n❌ 응급실 검색 실패:", error);
+      console.error(`❌ [응급실 검색 실패]`, error.message);
       setError(error.message);
       addProgress(`❌ 오류 발생: ${error.message}`, "error");
 

@@ -62,7 +62,7 @@ export default function Result() {
           });
         },
         (error) => {
-          console.error("위치 정보를 가져올 수 없습니다:", error);
+          console.error("❌ [위치 정보 실패]", error.message);
           // 기본 위치 설정 (예: 고려대학교 서울캠퍼스)
           setCurrentLocation({
             lat: 37.5896,
@@ -82,20 +82,20 @@ export default function Result() {
   const saveRecord = async (resultData) => {
     try {
       if (!resultData.worker || !resultData.ktasLevel) {
-        console.warn("기록 저장에 필요한 데이터가 부족합니다.");
+        console.warn("⚠️ [기록 저장 실패] 필요한 데이터 부족");
         return;
       }
 
       // useRef로 중복 저장 방지 (더 강력한 체크)
       if (saveAttemptedRef.current) {
-        console.log("이미 저장 시도된 기록입니다. (useRef 체크)");
+        console.log("ℹ️ [중복 방지] 이미 저장 시도됨 (useRef)");
         return;
       }
 
       // 이미 저장되었는지 확인 (중복 저장 방지)
       const alreadySaved = localStorage.getItem("recordSaved");
       if (alreadySaved) {
-        console.log("이미 저장된 기록입니다. (localStorage 체크)");
+        console.log("ℹ️ [중복 방지] 이미 저장됨 (localStorage)");
         setRecordSaved(true);
         return;
       }
@@ -120,13 +120,8 @@ export default function Result() {
       const rescuerId = localStorage.getItem("selectedRescuerId");
       const finalRescuerId = rescuerId ? parseInt(rescuerId) : 1; // 기본값 1 (테스트용)
 
-      console.log("환자 기록 저장 시도:", {
-        rescuerId: finalRescuerId,
-        patientType,
-        ktasLevel: resultData.ktasLevel,
-        gender,
-        ageGroup,
-      });
+      console.log(`\n[환자 기록 저장 시도]`);
+      console.log(`구조대원: ${finalRescuerId} | 유형: ${patientType} | KTAS: ${resultData.ktasLevel}급 | 성별: ${gender || '미상'} | 연령: ${ageGroup || '미상'}`);
 
       const saved = await savePatientAssessment(
         finalRescuerId,
@@ -139,15 +134,12 @@ export default function Result() {
       );
 
       if (saved) {
-        console.log("✅ 환자 기록이 저장되었습니다.");
+        console.log("✅ [환자 기록 저장 완료]\n");
         localStorage.setItem("recordSaved", "true");
         setRecordSaved(true);
       }
     } catch (error) {
-      console.error("환자 기록 저장 오류:", {
-        message: error.message,
-        stack: error.stack,
-      });
+      console.error("❌ [환자 기록 저장 실패]", error.message);
     }
   };
 
