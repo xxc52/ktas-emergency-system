@@ -29,56 +29,91 @@ export async function GET(request) {
 
   const vworldUrl = `https://api.vworld.kr/req/address?service=address&request=getcoord&type=ROAD&address=${encodeURIComponent(address)}&format=json&key=${VWORLD_API_KEY}`;
 
-  try {
-    const response = await fetch(vworldUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      signal: AbortSignal.timeout(10000), // 10초 타임아웃
-    });
+  // 재시도 로직 (최대 3번)
+  let lastError = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      console.log(`[Geocode Proxy] Attempt ${attempt}/3`);
 
-    if (!response.ok) {
-      console.error(`[Geocode Proxy] VWorld API HTTP ${response.status}`);
-      return NextResponse.json({
-        error: `VWorld API returned HTTP ${response.status}`,
-        address: address
-      }, { status: response.status });
+      const response = await fetch(vworldUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (compatible; KTAS-Emergency-System/1.0)',
+        },
+        signal: AbortSignal.timeout(15000), // 15초 타임아웃 (증가)
+      });
+
+      if (!response.ok) {
+        console.error(`[Geocode Proxy] Attempt ${attempt} - VWorld API HTTP ${response.status}`);
+
+        // 502, 503 에러는 재시도
+        if (attempt < 3 && (response.status === 502 || response.status === 503)) {
+          lastError = new Error(`HTTP ${response.status}`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt)); // 1초, 2초 대기
+          continue;
+        }
+
+        return NextResponse.json({
+          error: `VWorld API returned HTTP ${response.status}`,
+          address: address
+        }, { status: response.status });
+      }
+
+      const data = await response.json();
+
+      console.log(`[Geocode Proxy] Attempt ${attempt} - VWorld Response Status: ${data.response?.status || 'Unknown'}`);
+
+      // VWorld API 응답이 에러인 경우도 재시도
+      if (data.response?.status !== 'OK') {
+        console.error(`[Geocode Proxy] Attempt ${attempt} - VWorld API Error: ${data.response?.status || 'Unknown error'}`);
+
+        if (attempt < 3) {
+          lastError = new Error(`VWorld API status: ${data.response?.status}`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+          continue;
+        }
+
+        console.error(`[Geocode Proxy] Full response:`, JSON.stringify(data));
+      }
+
+      // 성공 시 즉시 반환
+      console.log(`[Geocode Proxy] Success on attempt ${attempt}`);
+      return NextResponse.json(data, {
+        status: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+      });
+
+    } catch (error) {
+      console.error(`[Geocode Proxy] Attempt ${attempt} Exception:`, error.message);
+      lastError = error;
+
+      // 마지막 시도가 아니면 재시도
+      if (attempt < 3) {
+        console.log(`[Geocode Proxy] Retrying after ${1000 * attempt}ms...`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        continue;
+      }
     }
-
-    const data = await response.json();
-
-    console.log(`[Geocode Proxy] VWorld Response Status: ${data.response?.status || 'Unknown'}`);
-
-    // VWorld API 응답이 에러인 경우
-    if (data.response?.status !== 'OK') {
-      console.error(`[Geocode Proxy] VWorld API Error: ${data.response?.status || 'Unknown error'}`);
-      console.error(`[Geocode Proxy] Full response:`, JSON.stringify(data));
-    }
-
-    return NextResponse.json(data, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-    });
-  } catch (error) {
-    console.error('[Geocode Proxy] Exception:', error);
-    console.error('[Geocode Proxy] Error details:', {
-      message: error.message,
-      name: error.name,
-      stack: error.stack,
-      address: address,
-    });
-
-    return NextResponse.json({
-      error: 'Failed to geocode address',
-      details: error.message,
-      address: address
-    }, { status: 500 });
   }
+
+  // 모든 재시도 실패
+  console.error('[Geocode Proxy] All attempts failed');
+  console.error('[Geocode Proxy] Last error details:', {
+    message: lastError?.message,
+    name: lastError?.name,
+    address: address,
+  });
+
+  return NextResponse.json({
+    error: 'Failed to geocode address after 3 attempts',
+    details: lastError?.message || 'Unknown error',
+    address: address
+  }, { status: 500 });
 }
 
 // OPTIONS 요청 처리 (CORS preflight)
