@@ -5,7 +5,7 @@
 
 // LLM API 기본 설정
 const LLM_CONFIG = {
-  BASE_URL: "http://localhost:8000", // 로컬 LLM 서버
+  BASE_URL: "https://1bf7fadf6be7.ngrok-free.app", // ngrok 터널 (로컬 LLM 서버)
   ENDPOINTS: {
     HEALTH: "/health",
     DEPARTMENT: "/department",
