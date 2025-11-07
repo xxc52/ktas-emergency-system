@@ -3,39 +3,23 @@
  * 진료과목 코드 판단 및 병원 검색을 위한 LLM 연동
  */
 
-// LLM API 기본 설정
+// LLM API 기본 설정 (Next.js API Routes 사용)
 const LLM_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_LLM_API_URL || "http://localhost:8000", // LLM 서버 (로컬 또는 ngrok)
+  BASE_URL: "/api/llm", // Vercel 서버리스 함수 (OpenAI GPT-4 Turbo)
   ENDPOINTS: {
-    HEALTH: "/health",
     DEPARTMENT: "/department",
     EMERGENCY_FILTERS: "/emergency-filters", // 응급실 필터 판단 (KTAS 1-4급)
   },
-  TIMEOUT: 100000, // 100초 타임아웃 (GPT-5-mini 응답 시간 고려)
+  TIMEOUT: 60000, // 60초 타임아웃
 };
 
 /**
- * LLM 서버 상태 확인
+ * LLM 서버 상태 확인 (Vercel 서버리스 함수는 항상 사용 가능)
  * @returns {Promise<boolean>} 서버 사용 가능 여부
  */
 export async function checkLLMHealth() {
-  try {
-    const response = await fetch(
-      `${LLM_CONFIG.BASE_URL}${LLM_CONFIG.ENDPOINTS.HEALTH}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        signal: AbortSignal.timeout(LLM_CONFIG.TIMEOUT),
-      }
-    );
-
-    return response.ok;
-  } catch (error) {
-    console.warn("LLM 서버 연결 실패:", error.message);
-    return false;
-  }
+  // Vercel 서버리스 함수는 항상 사용 가능
+  return true;
 }
 
 /**
